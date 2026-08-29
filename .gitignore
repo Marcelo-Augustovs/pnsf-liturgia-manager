@@ -39,3 +39,25 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# IDEs e Editores de Código
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# TypeScript & Cache de Build (Presentes na raiz do seu projeto)
+tsconfig.tsbuildinfo
+*.tsbuildinfo
+
+# Arquivos de log e SO
+Thumbs.db
+*.log
+
+# Caso utilize .env.example público, garanta que arquivos com chaves fiquem ignorados:
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+!.env.example
