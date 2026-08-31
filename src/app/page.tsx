@@ -2,7 +2,7 @@ import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import GridCards from "@/components/GridCards";
 import Footer from "@/components/Footer";
-import { CARDS_DATA } from "@/data/pageCardsData";
+import { CARDS_DATA } from "@/data/homeCardsData";
 
 export default function Home() {
   return (
