@@ -1,10 +1,10 @@
-export type FormaMissaId = 'ordinaria' | 'ad_orientem' | 'extraordinaria';
+export type FormaCelebracao = 'ordinaria' | 'ad_orientem' | 'extraordinaria';
 
-export type TempoLiturgicoId = 'quaresma' | 'pascoa' | 'tempo_comum' | 'advento';
+export type TempoLiturgico = 'quaresma' | 'pascal' | 'comum' | 'advento';
 
-export type GrauCelebracaoId = 'solenidade' | 'festa' | 'memoria' | 'datas_moveis';
+export type GrauCelebracao = 'solenidade' | 'festa' | 'memoria' | 'datas_moveis' | 'domingo';
 
-export type CategoriaRito = 'ritos_iniciais' | 'liturgia_palavra' | 'liturgia_eucaristica' | 'ritos_finais';
+export type GrupoRito = 'iniciais' | 'palavra' | 'eucaristica' | 'finais';
 
 export interface MediaContent {
   type: 'image' | 'video';
@@ -12,57 +12,73 @@ export interface MediaContent {
   caption?: string;
 }
 
-export interface LiturgicalColorInfo {
-  name: string;
-  badgeBg: string;
-  badgeText: string;
-  badgeBorder: string;
-  accentColor: string;
-  dotBg: string;
-  hex: string;
-}
-
-export interface FormaMissa {
-  id: FormaMissaId;
-  nome: string;
-  descricao: string;
-  badgeLabel: string;
-}
-
-export interface TempoLiturgico {
-  id: TempoLiturgicoId;
-  nome: string;
-  corLiturgica: LiturgicalColorInfo;
-  descricao: string;
-  periodo: string;
-}
-
-export interface GrauCelebracao {
-  id: GrauCelebracaoId;
-  nome: string;
-  descricao: string;
-  hierarquia: string;
-}
-
-export interface PassoMissa {
+export interface PassoRito {
   id: string;
   numero: number;
-  categoria: CategoriaRito;
-  categoriaNome: string;
   titulo: string;
-  subtitulo?: string;
+  subTitulo?: string;
   descricao?: string;
   rubrica?: string;
   textos?: string[];
   items?: string[];
   media?: MediaContent;
   iconName?: string;
-  formasSuportadas?: FormaMissaId[];
-  temposEspecificos?: TempoLiturgicoId[];
 }
 
-export interface CategoriaInfo {
-  id: CategoriaRito;
+export interface RitosGrupos {
+  iniciais: PassoRito[];
+  palavra: PassoRito[];
+  eucaristica: PassoRito[];
+  finais: PassoRito[];
+}
+
+export interface Celebracao {
+  id: string;
+  nome: string; // Ex: "1º Domingo da Quaresma", "Corpus Christi"
+  descricaoBreve?: string;
+  forma: FormaCelebracao;
+  tempoLiturgico: TempoLiturgico;
+  grauCelebracao: GrauCelebracao;
+  ritos: RitosGrupos;
+}
+
+export interface FiltrosMissa {
+  forma: FormaCelebracao;
+  tempo: TempoLiturgico;
+  grau?: GrauCelebracao | 'todos';
+}
+
+export interface TempoLiturgicoMetadata {
+  id: TempoLiturgico;
+  nome: string;
+  descricao: string;
+  periodo: string;
+  corLiturgica: {
+    name: string;
+    badgeBg: string;
+    badgeText: string;
+    badgeBorder: string;
+    accentColor: string;
+    dotBg: string;
+    hex: string;
+  };
+}
+
+export interface FormaCelebracaoOption {
+  id: FormaCelebracao;
+  nome: string;
+  descricao: string;
+  badgeLabel: string;
+}
+
+export interface GrauCelebracaoOption {
+  id: GrauCelebracao | 'todos';
+  nome: string;
+  descricao?: string;
+}
+
+export interface GrupoRitoInfo {
+  id: GrupoRito;
   nome: string;
   descricao: string;
   iconName: string;
