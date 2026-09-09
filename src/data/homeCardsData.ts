@@ -31,6 +31,6 @@ export const CARDS_DATA: CardItem[] = [
         id: "devocionais",
         title: "ATOS DEVOCIONAIS",
         description: "Oração do Santo Terço, novenas, via-sacra e devoções da nossa comunidade.",
-        imageUrl: "https://images.unsplash.com/photo-1499209974431-9dddcece7f88?q=80&w=600&auto=format&fit=crop",
+        imageUrl: "/images/devocional.webp",
     },
 ];
