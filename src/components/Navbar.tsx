@@ -27,7 +27,7 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 w-full bg-[#1A253A]/95 backdrop-blur-md border-b border-[#BF953F]/30 shadow-lg transition-all duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
-          
+
           {/* Brand / Logo */}
           <Link
             href="#"
@@ -35,7 +35,11 @@ export default function Navbar() {
           >
             <div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-gradient-to-br from-[#BF953F] via-[#FCF6BA] to-[#B38728] p-[1.5px] shadow-sm group-hover:scale-105 transition-transform duration-300">
               <div className="w-full h-full bg-[#1A253A] rounded-full flex items-center justify-center">
-                <Cross className="w-4 h-4 text-[#FCF6BA]" />
+                <img
+                  src="/images/brasao_paroquia.webp"
+                  alt="brasao da paroquia"
+                  className="w-full h-full object-contain -translate-x-[-2px]"
+                />
               </div>
             </div>
             <div className="flex flex-col">

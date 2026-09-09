@@ -18,7 +18,11 @@ export default function Footer() {
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#BF953F] via-[#FCF6BA] to-[#B38728] p-[1.5px] shadow-md">
                 <div className="w-full h-full bg-[#1A253A] rounded-full flex items-center justify-center">
-                  <Cross className="w-5 h-5 text-[#FCF6BA]" />
+                  <img
+                    src="/images/brasao_paroquia.webp"
+                    alt="brasao da paroquia"
+                    className="w-full h-full object-contain -translate-x-[-2px]"
+                  />
                 </div>
               </div>
               <div className="flex flex-col">
