@@ -83,3 +83,15 @@ export interface GrupoRitoInfo {
   descricao: string;
   iconName: string;
 }
+
+export interface CelebracaoAccordionState {
+  openCelebracaoIds: Set<string>;
+  openGroupIds: Set<string>;
+  openStepIds: Set<string>;
+}
+
+export interface CelebracaoStats {
+  totalPassos: number;
+  totalGruposAtivos: number;
+}
+
