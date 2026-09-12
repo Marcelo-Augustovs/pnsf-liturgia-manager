@@ -10,13 +10,10 @@ import {
   GRUPOS_RITO_INFO
 } from '@/data/ritosMissaData';
 import {
-  FormaCelebracao,
-  TempoLiturgico,
   GrauCelebracao,
   GrupoRito,
-  PassoRito,
   Celebracao,
-  FiltrosMissa
+  FiltrosMissa,
 } from '@/types/ritosMissa';
 import { MediaRenderer } from '@/components/MediaRenderer';
 import { DynamicIcon } from '@/components/DynamicIcon';
@@ -27,7 +24,6 @@ import {
   Clock,
   Sparkles,
   ChevronDown,
-  ChevronUp,
   Church,
   CheckCircle2,
   Filter,
@@ -420,237 +416,287 @@ export default function RitosMissaPage() {
                 const formaInfo = FORMAS_CELEBRACAO_OPTIONS.find((f) => f.id === celebracao.forma) || FORMAS_CELEBRACAO_OPTIONS[0];
                 const isCelebracaoOpen = openCelebracaoIds.has(celebracao.id);
 
+                // Cálculo dos metadados estatísticos da celebração
+                const totalPassosCelebracao =
+                  (celebracao.ritos?.iniciais?.length || 0) +
+                  (celebracao.ritos?.palavra?.length || 0) +
+                  (celebracao.ritos?.eucaristica?.length || 0) +
+                  (celebracao.ritos?.finais?.length || 0);
+
                 return (
                   <article
                     key={celebracao.id}
-                    className="bg-white border border-slate-200 rounded-2xl shadow-sm hover:shadow-md transition-all overflow-hidden space-y-6"
+                    className="bg-white border border-slate-200 rounded-2xl shadow-sm hover:shadow-md transition-all overflow-hidden"
                   >
-                    {/* Cabeçalho do Card Principal da Celebração */}
+                    {/* Cabeçalho do Card Principal da Celebração (Accordion Pai) */}
                     <button
                       type="button"
                       onClick={() => toggleCelebracao(celebracao.id)}
-                      className="w-full bg-slate-900 text-white p-5 sm:p-6 border-b border-slate-800 space-y-3 text-left"
+                      className="w-full bg-slate-900 hover:bg-slate-850 text-white p-5 sm:p-6 transition-colors space-y-4 text-left border-b border-slate-800 cursor-pointer group"
+                      aria-expanded={isCelebracaoOpen}
                     >
-                      <div className="flex flex-wrap items-center gap-2">
-                        {/* Liturgical Color Badge */}
-                        <span
-                          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border shadow-xs ${tempoInfo.corLiturgica.badgeBg} ${tempoInfo.corLiturgica.badgeText} ${tempoInfo.corLiturgica.badgeBorder}`}
-                        >
+                      <div className="flex flex-wrap items-center justify-between gap-3">
+                        <div className="flex flex-wrap items-center gap-2">
+                          {/* Liturgical Color Badge */}
                           <span
-                            className={`w-2 h-2 rounded-full ${tempoInfo.corLiturgica.dotBg}`}
-                          />
-                          Tempo: {tempoInfo.nome} ({tempoInfo.corLiturgica.name})
-                        </span>
+                            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border shadow-xs ${tempoInfo.corLiturgica.badgeBg} ${tempoInfo.corLiturgica.badgeText} ${tempoInfo.corLiturgica.badgeBorder}`}
+                          >
+                            <span
+                              className={`w-2 h-2 rounded-full ${tempoInfo.corLiturgica.dotBg}`}
+                            />
+                            Tempo: {tempoInfo.nome} ({tempoInfo.corLiturgica.name})
+                          </span>
 
-                        {/* Grau Badge */}
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-800 text-amber-300 border border-slate-700">
-                          <Calendar className="w-3 h-3 text-amber-400" />
-                          Grau: {celebracao.grauCelebracao.toUpperCase()}
-                        </span>
+                          {/* Grau Badge */}
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-800 text-amber-300 border border-slate-700">
+                            <Calendar className="w-3 h-3 text-amber-400" />
+                            Grau: {celebracao.grauCelebracao.toUpperCase()}
+                          </span>
 
-                        {/* Forma Badge */}
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-800 text-slate-300 border border-slate-700">
-                          <Sparkles className="w-3 h-3 text-amber-400" />
-                          {formaInfo.nome}
+                          {/* Forma Badge */}
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-800 text-slate-300 border border-slate-700">
+                            <Sparkles className="w-3 h-3 text-amber-400" />
+                            {formaInfo.nome}
+                          </span>
+                        </div>
+
+                        {/* Badge de Contagem Total de Passos */}
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-800/80 text-amber-400 border border-amber-500/30">
+                          <ListOrdered className="w-3.5 h-3.5 text-amber-400" />
+                          <span>{totalPassosCelebracao} passos litúrgicos</span>
                         </span>
                       </div>
 
                       <div className="flex items-center justify-between gap-4">
-                        <div>
-                          <h2 className="text-2xl sm:text-3xl font-bold font-serif text-amber-400 tracking-wide">
+                        <div className="space-y-1">
+                          <h2 className="text-2xl sm:text-3xl font-bold font-serif text-amber-400 tracking-wide group-hover:text-amber-300 transition-colors">
                             {celebracao.nome}
                           </h2>
 
                           {celebracao.descricaoBreve && (
-                            <p className="text-slate-300 text-xs sm:text-sm leading-relaxed mt-1">
+                            <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
                               {celebracao.descricaoBreve}
                             </p>
                           )}
                         </div>
 
-                        {isCelebracaoOpen ? (
-                          <ChevronUp className="w-6 h-6 text-amber-400 flex-shrink-0" />
-                        ) : (
-                          <ChevronDown className="w-6 h-6 text-slate-400 flex-shrink-0" />
-                        )}
+                        {/* Indicador Visual do Accordion Pai */}
+                        <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs font-semibold text-slate-200 group-hover:border-amber-500/40 group-hover:text-white transition-all flex-shrink-0">
+                          <span className="hidden sm:inline">
+                            {isCelebracaoOpen ? 'Recolher Ritos' : 'Ver Ritos Litúrgicos'}
+                          </span>
+                          <ChevronDown
+                            className={`w-4 h-4 text-amber-400 transition-transform duration-300 ease-in-out ${isCelebracaoOpen ? 'rotate-180' : 'rotate-0'
+                              }`}
+                          />
+                        </div>
                       </div>
-
                     </button>
 
-                    {/* CONTEÚDO DOS 4 GRANDES GRUPOS DE RITOS */}
-                    <div className="p-5 sm:p-6 space-y-6">
-                      {(['iniciais', 'palavra', 'eucaristica', 'finais'] as GrupoRito[]).map(
-                        (grupoKey) => {
-                          const passosDoGrupo = celebracao.ritos[grupoKey];
-                          const grupoInfo = GRUPOS_RITO_INFO[grupoKey];
-                          const groupKeyId = `${celebracao.id}-${grupoKey}`;
-                          const isGroupOpen = openGroupIds.has(groupKeyId);
+                    {/* WRAPPER COM ANIMAÇÃO SUAVE DE EXPANSÃO/RECOLHIMENTO DO ACCORDION PAI */}
+                    <div
+                      className={`grid transition-all duration-300 ease-in-out ${isCelebracaoOpen
+                        ? 'grid-rows-[1fr] opacity-100'
+                        : 'grid-rows-[0fr] opacity-0 overflow-hidden'
+                        }`}
+                    >
+                      <div className="overflow-hidden">
+                        {/* CONTEÚDO DOS 4 GRANDES GRUPOS DE RITOS */}
+                        <div className="p-5 sm:p-6 space-y-6">
+                          {(['iniciais', 'palavra', 'eucaristica', 'finais'] as GrupoRito[]).map(
+                            (grupoKey) => {
+                              const passosDoGrupo = celebracao.ritos[grupoKey];
+                              const grupoInfo = GRUPOS_RITO_INFO[grupoKey];
+                              const groupKeyId = `${celebracao.id}-${grupoKey}`;
+                              const isGroupOpen = openGroupIds.has(groupKeyId);
 
-                          if (!passosDoGrupo || passosDoGrupo.length === 0) return null;
+                              if (!passosDoGrupo || passosDoGrupo.length === 0) return null;
 
-                          return (
-                            <section
-                              key={grupoKey}
-                              className="border border-slate-200 rounded-2xl overflow-hidden bg-slate-50/50 space-y-0"
-                            >
-                              {/* ACCORDION DO GRUPO DE RITO */}
-                              <button
-                                type="button"
-                                onClick={() => toggleGroup(celebracao.id, grupoKey)}
-                                className="w-full bg-slate-100 hover:bg-slate-200/80 text-slate-900 p-4 font-bold flex items-center justify-between transition-all cursor-pointer text-left border-b border-slate-200"
-                              >
-                                <div className="flex items-center gap-3">
-                                  <div className="w-8 h-8 rounded-xl bg-slate-900 text-amber-400 flex items-center justify-center font-bold">
-                                    <DynamicIcon name={grupoInfo.iconName} className="w-4 h-4" />
-                                  </div>
-                                  <div>
-                                    <h3 className="text-base font-serif font-bold text-slate-900">
-                                      {grupoInfo.nome}
-                                    </h3>
-                                    <p className="text-xs text-slate-500 font-sans font-normal">
-                                      {grupoInfo.descricao}
-                                    </p>
-                                  </div>
-                                </div>
+                              return (
+                                <section
+                                  key={grupoKey}
+                                  className="border border-slate-200 rounded-2xl overflow-hidden bg-slate-50/50 space-y-0 shadow-2xs"
+                                >
+                                  {/* ACCORDION DO GRUPO DE RITO (FILHO 1) */}
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      toggleGroup(celebracao.id, grupoKey);
+                                    }}
+                                    className="w-full bg-slate-100 hover:bg-slate-200/80 text-slate-900 p-4 font-bold flex items-center justify-between transition-all cursor-pointer text-left border-b border-slate-200"
+                                    aria-expanded={isGroupOpen}
+                                  >
+                                    <div className="flex items-center gap-3">
+                                      <div className="w-8 h-8 rounded-xl bg-slate-900 text-amber-400 flex items-center justify-center font-bold shadow-xs">
+                                        <DynamicIcon name={grupoInfo.iconName} className="w-4 h-4" />
+                                      </div>
+                                      <div>
+                                        <h3 className="text-base font-serif font-bold text-slate-900">
+                                          {grupoInfo.nome}
+                                        </h3>
+                                        <p className="text-xs text-slate-500 font-sans font-normal">
+                                          {grupoInfo.descricao}
+                                        </p>
+                                      </div>
+                                    </div>
 
-                                <div className="flex items-center gap-2">
-                                  <span className="px-2.5 py-1 rounded-md bg-white border border-slate-300 text-slate-700 text-xs font-semibold">
-                                    {passosDoGrupo.length} passos
-                                  </span>
-                                  {isGroupOpen ? (
-                                    <ChevronUp className="w-5 h-5 text-amber-600" />
-                                  ) : (
-                                    <ChevronDown className="w-5 h-5 text-slate-400" />
-                                  )}
-                                </div>
-                              </button>
+                                    <div className="flex items-center gap-2">
+                                      <span className="px-2.5 py-1 rounded-md bg-white border border-slate-300 text-slate-700 text-xs font-semibold">
+                                        {passosDoGrupo.length} passos
+                                      </span>
+                                      <ChevronDown
+                                        className={`w-5 h-5 text-amber-600 transition-transform duration-300 ${isGroupOpen ? 'rotate-180 text-amber-600' : 'rotate-0 text-slate-400'
+                                          }`}
+                                      />
+                                    </div>
+                                  </button>
 
-                              {/* LISTA DOS PASSOS DO GRUPO (Renderização Condicional mantendo dados na memória) */}
-                              {isGroupOpen && (
-                                <div className="p-4 sm:p-5 space-y-4">
-                                  {passosDoGrupo.map((passo) => {
-                                    const stepKeyId = `${celebracao.id}-${passo.id}`;
-                                    const isStepOpen = openStepIds.has(stepKeyId);
+                                  {/* LISTA DOS PASSOS DO GRUPO COM TRANSIÇÃO SUAVE */}
+                                  <div
+                                    className={`grid transition-all duration-300 ease-in-out ${isGroupOpen
+                                      ? 'grid-rows-[1fr] opacity-100'
+                                      : 'grid-rows-[0fr] opacity-0 overflow-hidden'
+                                      }`}
+                                  >
+                                    <div className="overflow-hidden">
+                                      <div className="p-4 sm:p-5 space-y-4">
+                                        {passosDoGrupo.map((passo) => {
+                                          const stepKeyId = `${celebracao.id}-${passo.id}`;
+                                          const isStepOpen = openStepIds.has(stepKeyId);
 
-                                    return (
-                                      <article
-                                        key={passo.id}
-                                        className="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 shadow-xs space-y-3"
-                                      >
-                                        {/* Cabeçalho do Passo com Botão Recolher/Detalhes */}
-                                        <div className="flex items-start justify-between gap-3">
-                                          <div className="space-y-1">
-                                            <div className="flex items-center gap-2">
-                                              <span className="px-2.5 py-0.5 rounded-md bg-amber-500/10 text-amber-900 border border-amber-500/20 text-xs font-bold">
-                                                Passo #{passo.numero}
-                                              </span>
-                                            </div>
-                                            <h4 className="text-base font-bold font-serif text-slate-900">
-                                              {passo.titulo}
-                                            </h4>
-                                            {passo.subTitulo && (
-                                              <p className="text-xs font-semibold text-amber-700">
-                                                {passo.subTitulo}
-                                              </p>
-                                            )}
-                                          </div>
-
-                                          {/* BOTÃO EXPANDIR / RECOLHER PASSO INDIVIDUAL */}
-                                          <button
-                                            type="button"
-                                            onClick={() => toggleStep(celebracao.id, passo.id)}
-                                            className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer flex-shrink-0"
-                                          >
-                                            <span>{isStepOpen ? 'Recolher' : 'Detalhes'}</span>
-                                            {isStepOpen ? (
-                                              <ChevronUp className="w-3.5 h-3.5 text-amber-600" />
-                                            ) : (
-                                              <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
-                                            )}
-                                          </button>
-                                        </div>
-
-                                        {/* Descrição Curta do Passo */}
-                                        {passo.descricao && (
-                                          <p className="text-slate-700 text-xs sm:text-sm leading-relaxed">
-                                            {passo.descricao}
-                                          </p>
-                                        )}
-
-                                        {/* CONTEÚDO DETALHADO DO PASSO (Exibido apenas quando isStepOpen === true) */}
-                                        {isStepOpen && (
-                                          <div className="space-y-4 pt-3 border-t border-slate-100">
-
-                                            {/* Rubrica Litúrgica Destaque */}
-                                            {passo.rubrica && (
-                                              <div className="bg-amber-50/70 border-l-4 border-amber-500 text-amber-950 p-3.5 rounded-r-xl text-xs sm:text-sm font-serif italic space-y-1">
-                                                <div className="font-sans font-bold not-italic text-amber-800 text-xs uppercase tracking-wider flex items-center gap-1">
-                                                  <span>❖ Rubrica Litúrgica</span>
-                                                </div>
-                                                <p>{passo.rubrica}</p>
-                                              </div>
-                                            )}
-
-                                            {/* Diálogos / Textos da Celebração */}
-                                            {passo.textos && passo.textos.length > 0 && (
-                                              <div className="space-y-2 bg-slate-50 border border-slate-200 rounded-xl p-3.5">
-                                                <h5 className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1">
-                                                  <FileText className="w-3.5 h-3.5 text-amber-600" /> Diálogo / Textos Litúrgicos
-                                                </h5>
-                                                <div className="space-y-1.5">
-                                                  {passo.textos.map((txt, tIdx) => (
-                                                    <p
-                                                      key={tIdx}
-                                                      className="text-slate-700 text-xs sm:text-sm font-serif leading-relaxed"
-                                                    >
-                                                      {txt}
+                                          return (
+                                            <article
+                                              key={passo.id}
+                                              className="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 shadow-xs space-y-3"
+                                            >
+                                              {/* Cabeçalho do Passo com Botão Recolher/Detalhes */}
+                                              <div className="flex items-start justify-between gap-3">
+                                                <div className="space-y-1">
+                                                  <div className="flex items-center gap-2">
+                                                    <span className="px-2.5 py-0.5 rounded-md bg-amber-500/10 text-amber-900 border border-amber-500/20 text-xs font-bold">
+                                                      Passo #{passo.numero}
+                                                    </span>
+                                                  </div>
+                                                  <h4 className="text-base font-bold font-serif text-slate-900">
+                                                    {passo.titulo}
+                                                  </h4>
+                                                  {passo.subTitulo && (
+                                                    <p className="text-xs font-semibold text-amber-700">
+                                                      {passo.subTitulo}
                                                     </p>
-                                                  ))}
+                                                  )}
+                                                </div>
+
+                                                {/* BOTÃO EXPANDIR / RECOLHER PASSO INDIVIDUAL (FILHO 2) */}
+                                                <button
+                                                  type="button"
+                                                  onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    toggleStep(celebracao.id, passo.id);
+                                                  }}
+                                                  className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer flex-shrink-0"
+                                                  aria-expanded={isStepOpen}
+                                                >
+                                                  <span>{isStepOpen ? 'Recolher' : 'Detalhes'}</span>
+                                                  <ChevronDown
+                                                    className={`w-3.5 h-3.5 transition-transform duration-300 ${isStepOpen ? 'rotate-180 text-amber-600' : 'rotate-0 text-slate-400'
+                                                      }`}
+                                                  />
+                                                </button>
+                                              </div>
+
+                                              {/* Descrição Curta do Passo */}
+                                              {passo.descricao && (
+                                                <p className="text-slate-700 text-xs sm:text-sm leading-relaxed">
+                                                  {passo.descricao}
+                                                </p>
+                                              )}
+
+                                              {/* CONTEÚDO DETALHADO DO PASSO COM TRANSIÇÃO SUAVE */}
+                                              <div
+                                                className={`grid transition-all duration-300 ease-in-out ${isStepOpen
+                                                  ? 'grid-rows-[1fr] opacity-100'
+                                                  : 'grid-rows-[0fr] opacity-0 overflow-hidden'
+                                                  }`}
+                                              >
+                                                <div className="overflow-hidden">
+                                                  <div className="space-y-4 pt-3 border-t border-slate-100">
+
+                                                    {/* Rubrica Litúrgica Destaque */}
+                                                    {passo.rubrica && (
+                                                      <div className="bg-amber-50/70 border-l-4 border-amber-500 text-amber-950 p-3.5 rounded-r-xl text-xs sm:text-sm font-serif italic space-y-1">
+                                                        <div className="font-sans font-bold not-italic text-amber-800 text-xs uppercase tracking-wider flex items-center gap-1">
+                                                          <span>❖ Rubrica Litúrgica</span>
+                                                        </div>
+                                                        <p>{passo.rubrica}</p>
+                                                      </div>
+                                                    )}
+
+                                                    {/* Diálogos / Textos da Celebração */}
+                                                    {passo.textos && passo.textos.length > 0 && (
+                                                      <div className="space-y-2 bg-slate-50 border border-slate-200 rounded-xl p-3.5">
+                                                        <h5 className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1">
+                                                          <FileText className="w-3.5 h-3.5 text-amber-600" /> Diálogo / Textos Litúrgicos
+                                                        </h5>
+                                                        <div className="space-y-1.5">
+                                                          {passo.textos.map((txt, tIdx) => (
+                                                            <p
+                                                              key={tIdx}
+                                                              className="text-slate-700 text-xs sm:text-sm font-serif leading-relaxed"
+                                                            >
+                                                              {txt}
+                                                            </p>
+                                                          ))}
+                                                        </div>
+                                                      </div>
+                                                    )}
+
+                                                    {/* Elementos e Gestos Principais */}
+                                                    {passo.items && passo.items.length > 0 && (
+                                                      <div className="space-y-2">
+                                                        <h5 className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1">
+                                                          <CheckCircle2 className="w-3.5 h-3.5 text-amber-600" /> Elementos e Gestos Principais
+                                                        </h5>
+                                                        <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                                          {passo.items.map((item, iIdx) => (
+                                                            <li
+                                                              key={iIdx}
+                                                              className="flex items-start gap-2 text-slate-700 text-xs sm:text-sm"
+                                                            >
+                                                              <CheckCircle2 className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+                                                              <span>{item}</span>
+                                                            </li>
+                                                          ))}
+                                                        </ul>
+                                                      </div>
+                                                    )}
+
+                                                    {/* Mídia Demonstrativa (Imagem / Vídeo) */}
+                                                    {passo.media && (
+                                                      <div className="pt-2">
+                                                        <h5 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2 flex items-center gap-1">
+                                                          <Sparkles className="w-3.5 h-3.5 text-amber-600" /> Mídia Demonstrativa
+                                                        </h5>
+                                                        <MediaRenderer media={passo.media} />
+                                                      </div>
+                                                    )}
+
+                                                  </div>
                                                 </div>
                                               </div>
-                                            )}
-
-                                            {/* Elementos e Gestos Principais */}
-                                            {passo.items && passo.items.length > 0 && (
-                                              <div className="space-y-2">
-                                                <h5 className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1">
-                                                  <CheckCircle2 className="w-3.5 h-3.5 text-amber-600" /> Elementos e Gestos Principais
-                                                </h5>
-                                                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                                  {passo.items.map((item, iIdx) => (
-                                                    <li
-                                                      key={iIdx}
-                                                      className="flex items-start gap-2 text-slate-700 text-xs sm:text-sm"
-                                                    >
-                                                      <CheckCircle2 className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
-                                                      <span>{item}</span>
-                                                    </li>
-                                                  ))}
-                                                </ul>
-                                              </div>
-                                            )}
-
-                                            {/* Mídia Demonstrativa (Imagem / Vídeo) */}
-                                            {passo.media && (
-                                              <div className="pt-2">
-                                                <h5 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2 flex items-center gap-1">
-                                                  <Sparkles className="w-3.5 h-3.5 text-amber-600" /> Mídia Demonstrativa
-                                                </h5>
-                                                <MediaRenderer media={passo.media} />
-                                              </div>
-                                            )}
-
-                                          </div>
-                                        )}
-                                      </article>
-                                    );
-                                  })}
-                                </div>
-                              )}
-                            </section>
-                          );
-                        }
-                      )}
+                                            </article>
+                                          );
+                                        })}
+                                      </div>
+                                    </div>
+                                  </div>
+                                </section>
+                              );
+                            }
+                          )}
+                        </div>
+                      </div>
                     </div>
                   </article>
                 );
