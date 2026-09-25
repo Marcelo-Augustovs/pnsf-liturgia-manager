@@ -147,6 +147,8 @@ export const CELEBRACOES_DATA: Celebracao[] = [
     forma: 'ordinaria',
     tempoLiturgico: 'quaresma',
     grauCelebracao: 'domingo',
+    imageUrl: '/images/quaresma.jpg',
+    imagem: '/images/quaresma.jpg',
     ritos: {
       iniciais: [
         {
@@ -425,6 +427,8 @@ export const CELEBRACOES_DATA: Celebracao[] = [
     forma: 'ordinaria',
     tempoLiturgico: 'comum',
     grauCelebracao: 'solenidade',
+    imageUrl: '/images/anunciacao.jpg',
+    imagem: '/images/anunciacao.jpg',
     ritos: {
       iniciais: [
         {
@@ -583,6 +587,8 @@ export const CELEBRACOES_DATA: Celebracao[] = [
     forma: 'ordinaria',
     tempoLiturgico: 'quaresma',
     grauCelebracao: 'solenidade',
+    imageUrl: '/images/anunciacao.jpg',
+    imagem: '/images/anunciacao.jpg',
     ritos: {
       iniciais: [
         {
