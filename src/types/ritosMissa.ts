@@ -41,6 +41,8 @@ export interface Celebracao {
   forma: FormaCelebracao;
   tempoLiturgico: TempoLiturgico;
   grauCelebracao: GrauCelebracao;
+  imageUrl?: string;
+  imagem?: string;
   ritos: RitosGrupos;
 }
 
