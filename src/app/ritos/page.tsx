@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   CELEBRACOES_DATA,
   FORMAS_CELEBRACAO_OPTIONS,
@@ -34,7 +35,8 @@ import {
   RotateCcw,
   SlidersHorizontal,
   FileText,
-  AlertCircle
+  AlertCircle,
+  Home
 } from 'lucide-react';
 
 export default function RitosMissaPage() {
@@ -66,6 +68,9 @@ export default function RitosMissaPage() {
   // Define quais passos individuais estão expandidos (chave: `${celebracaoId}-${passoId}`)
   const [openStepIds, setOpenStepIds] = useState<Set<string>>(new Set());
 
+  // Estado dos Accordions das Celebrações principais
+  const [openCelebracaoIds, setOpenCelebracaoIds] = useState<Set<string>>(new Set());
+
   // Verifica se o usuário alterou os seletores mas ainda não clicou em Pesquisar
   const temFiltrosPendentes = useMemo(() => {
     return (
@@ -93,9 +98,6 @@ export default function RitosMissaPage() {
     setFiltrosPesquisados({ ...filtrosSelecionados });
   };
 
-  const [openCelebracaoIds, setOpenCelebracaoIds] =
-    useState<Set<string>>(new Set());
-
   const toggleCelebracao = (celebracaoId: string) => {
     setOpenCelebracaoIds((prev) => {
       const next = new Set(prev);
@@ -109,7 +111,6 @@ export default function RitosMissaPage() {
       return next;
     });
   };
-
 
   // Redefinir filtros para o padrão inicial
   const handleResetFiltros = () => {
@@ -154,53 +155,56 @@ export default function RitosMissaPage() {
   const formaAtivaOption = FORMAS_CELEBRACAO_OPTIONS.find((f) => f.id === filtrosSelecionados.forma) || FORMAS_CELEBRACAO_OPTIONS[0];
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
-      {/* Top Header Bar */}
-      <header className="bg-slate-900 border-b border-slate-800 text-white sticky top-0 z-30 shadow-md">
+    <div className="min-h-screen bg-[#F8F4EC] text-[#17243A] flex flex-col font-sans relative overflow-x-hidden">
+
+      {/* HEADER SUPREMO INSTITUCIONAL (AZUL-MARINHO COM GRADIENTE) */}
+      <header className="bg-gradient-to-b from-[#17243A] to-[#121D2F] text-white sticky top-0 z-30 shadow-md border-b border-[#253654]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-amber-600/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shadow-inner flex-shrink-0">
+          <div className="flex items-center gap-3.5">
+            {/* LOGOTIPO CIRCULAR COM ÍCONE EM DOURADO */}
+            <div className="w-10 h-10 rounded-full border border-[#DDBB70]/50 bg-[#17243A] flex items-center justify-center text-[#DDBB70] shadow-sm flex-shrink-0">
               <Church className="w-5 h-5" />
             </div>
             <div>
-              <h1 className="text-lg font-bold font-serif tracking-wide text-amber-400">
+              <h1 className="text-xl font-bold font-serif tracking-wide text-white leading-tight">
                 Liturgia da Santa Missa
               </h1>
-              <p className="text-xs text-slate-400 hidden sm:block">
-                Ordem do Rito • Guia Interativo por Celebrações Litúrgicas
+              <p className="text-[10px] sm:text-[11px] font-semibold tracking-widest text-[#DDBB70]/90 uppercase mt-0.5">
+                ORDEM DO RITO • GUIA INTERATIVO POR CELEBRAÇÕES LITÚRGICAS
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          {/* BOTÕES DE NAVEGAÇÃO SUPERIOR */}
+          <div className="flex items-center gap-2.5">
             <Link
               href="/"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 border border-slate-700 transition-all cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold bg-[#F5E6CA] hover:bg-[#EED5AA] text-[#17243A] transition-all cursor-pointer shadow-xs"
             >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Início</span>
+              <Home className="w-3.5 h-3.5 text-[#17243A]" />
+              <span>Início</span>
             </Link>
             <Link
               href="/ritos-complementares"
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-800 text-amber-400 hover:bg-slate-700 border border-amber-500/30 transition-all cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold bg-transparent hover:bg-white/5 text-[#F5E6CA] border border-[#D3C4A5]/60 transition-all cursor-pointer"
             >
-              <BookOpen className="w-3.5 h-3.5" />
+              <BookOpen className="w-3.5 h-3.5 text-[#F5E6CA]" />
               <span>Ritos Complementares</span>
             </Link>
           </div>
         </div>
       </header>
 
-      {/* Main Container */}
-      <main className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 flex-1 flex flex-col space-y-6">
+      {/* CONTAINER PRINCIPAL */}
+      <main className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 flex-1 flex flex-col space-y-6 z-10 relative">
 
-        {/* Banner do Tempo Litúrgico */}
-        <section className="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
-          <div className="space-y-2 flex-1">
+        {/* 2 & 3. CARD SUPERIOR: ORDEM DAS CELEBRAÇÕES LITÚRGICAS (COM RESPONSIVIDADE MOBILE AJUSTADA) */}
+        <section className="bg-[#FFFCF6] border border-[#E5D8BE] rounded-2xl p-5 sm:p-6 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-5 relative overflow-hidden">
+          <div className="space-y-2.5 flex-1 w-full">
+            {/* Badges superiores em flex-wrap */}
             <div className="flex flex-wrap items-center gap-2">
-              {/* Liturgical Color Badge */}
               <span
-                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border shadow-xs ${tempoAtivoMetadata.corLiturgica.badgeBg} ${tempoAtivoMetadata.corLiturgica.badgeText} ${tempoAtivoMetadata.corLiturgica.badgeBorder}`}
+                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${tempoAtivoMetadata.corLiturgica.badgeBg} ${tempoAtivoMetadata.corLiturgica.badgeText} ${tempoAtivoMetadata.corLiturgica.badgeBorder}`}
               >
                 <span
                   className={`w-2.5 h-2.5 rounded-full ${tempoAtivoMetadata.corLiturgica.dotBg} animate-pulse`}
@@ -208,63 +212,73 @@ export default function RitosMissaPage() {
                 Cor Litúrgica: {tempoAtivoMetadata.corLiturgica.name} ({tempoAtivoMetadata.nome})
               </span>
 
-              {/* Form Badge */}
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
-                <Sparkles className="w-3 h-3 text-amber-600" />
+              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-[#F5EFE6] text-[#7A6843] border border-[#E5D8BE]">
+                <Sparkles className="w-3 h-3 text-[#9A6F20]" />
                 {formaAtivaOption.nome}
               </span>
             </div>
 
-            <h2 className="text-2xl sm:text-3xl font-bold font-serif text-slate-900">
+            <h2 className="text-2xl sm:text-3xl font-bold font-serif text-[#17243A]">
               Ordem das Celebrações Litúrgicas
             </h2>
-            <p className="text-slate-600 text-sm leading-relaxed max-w-3xl">
+            <p className="text-[#5F6B7A] text-xs sm:text-sm leading-relaxed max-w-3xl">
               {tempoAtivoMetadata.descricao}
             </p>
           </div>
 
-          <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 text-xs text-slate-700 max-w-xs w-full space-y-1.5">
-            <div className="font-bold text-slate-900 flex items-center gap-1.5">
-              <Info className="w-4 h-4 text-amber-600" /> Orientação do Período
+          {/* Card Lado Direito: Orientação do Período */}
+          <div className="bg-[#F5EFE6]/60 border border-[#E5D8BE] rounded-xl p-4 text-xs text-[#5F6B7A] w-full md:max-w-xs space-y-1.5 flex-shrink-0">
+            <div className="font-bold text-[#17243A] flex items-center gap-1.5 uppercase tracking-wider text-xs">
+              <Info className="w-4 h-4 text-[#9A6F20]" /> Orientação do Período
             </div>
-            <p className="text-slate-600 leading-relaxed text-xs">
-              <strong className="text-slate-800">{tempoAtivoMetadata.nome}:</strong> {tempoAtivoMetadata.periodo}
+            <p className="text-[#5F6B7A] leading-relaxed text-xs">
+              <strong className="text-[#17243A] font-semibold">{tempoAtivoMetadata.nome}:</strong> {tempoAtivoMetadata.periodo}
             </p>
           </div>
         </section>
 
-        {/* PAINEL DE FILTROS E BOTÃO DE PESQUISA */}
-        <section className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-5">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-slate-900 text-amber-400 flex items-center justify-center font-bold">
-                <SlidersHorizontal className="w-4 h-4" />
+        {/* PAINEL DE FILTROS DE BUSCA POR CELEBRAÇÃO */}
+        <section className="bg-[#FFFCF6] border border-[#E5D8BE] rounded-3xl p-5 sm:p-6 shadow-sm space-y-4">
+
+          {/* CABEÇALHO DO PAINEL DE FILTROS */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-[#17243A] text-[#DDBB70] flex items-center justify-center font-bold flex-shrink-0 shadow-xs">
+                <SlidersHorizontal className="w-4 h-4 text-[#DDBB70]" />
               </div>
               <div>
-                <h3 className="text-sm font-bold uppercase tracking-wider text-slate-900">
-                  Filtros de Busca por Celebração
-                </h3>
-                <p className="text-xs text-slate-500">
+                <h2 className="text-sm font-bold uppercase tracking-widest text-[#17243A] font-serif">
+                  FILTROS DE BUSCA POR CELEBRAÇÃO
+                </h2>
+                <p className="text-xs text-[#827869] mt-0.5">
                   Selecione os parâmetros e clique em Pesquisar para filtrar os ritos.
                 </p>
               </div>
             </div>
 
             {temFiltrosPendentes && (
-              <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-300 animate-pulse">
-                <AlertCircle className="w-3.5 h-3.5" /> Clique em Pesquisar para aplicar
+              <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full bg-[#F5E6CA] text-[#7A5A18] border border-[#D8C29A] animate-pulse">
+                <AlertCircle className="w-3.5 h-3.5" /> Clique em Pesquisar para aplicar os filtros
               </span>
             )}
           </div>
 
+          {/* DIVISOR ORNAMENTAL SUTIL */}
+          <div className="flex items-center justify-center my-1 opacity-40">
+            <div className="h-[1px] bg-[#E5D8BE] flex-1" />
+            <span className="px-3 text-[#9A6F20] text-xs font-serif">❖</span>
+            <div className="h-[1px] bg-[#E5D8BE] flex-1" />
+          </div>
+
+          {/* GRID COM OS 3 BLOCOS DE FILTROS */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
 
-            {/* 1. Forma da Celebração */}
+            {/* BLOCO 1: FORMA DA CELEBRAÇÃO */}
             <div className="space-y-2">
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
-                <Layers className="w-3.5 h-3.5 text-amber-600" /> Forma da Celebração
+              <label className="text-[11px] font-bold uppercase tracking-wider text-[#17243A] flex items-center gap-2">
+                <Layers className="w-3.5 h-3.5 text-[#9A6F20]" /> FORMA DA CELEBRAÇÃO
               </label>
-              <div className="grid grid-cols-1 gap-1.5 bg-slate-100 p-1.5 rounded-xl">
+              <div className="bg-[#F3EEE3] p-2 rounded-2xl space-y-1.5 border border-[#EBE4D5]">
                 {FORMAS_CELEBRACAO_OPTIONS.map((forma) => {
                   const isSelected = filtrosSelecionados.forma === forma.id;
                   return (
@@ -274,20 +288,22 @@ export default function RitosMissaPage() {
                       onClick={() =>
                         setFiltrosSelecionados((prev) => ({ ...prev, forma: forma.id }))
                       }
-                      className={`w-full px-3 py-2 rounded-lg text-xs font-semibold flex items-center justify-between transition-all cursor-pointer ${isSelected
-                        ? 'bg-slate-900 text-white shadow-xs font-bold'
-                        : 'text-slate-700 hover:bg-slate-200/70 font-medium'
+                      className={`w-full px-3 py-2.5 rounded-xl text-xs flex items-center justify-between transition-all cursor-pointer ${isSelected
+                        ? 'bg-[#17243A] text-white shadow-xs font-bold'
+                        : 'bg-white/60 hover:bg-white text-[#4A5568] border border-transparent font-medium'
                         }`}
                     >
                       <span className="flex items-center gap-2">
                         <span
-                          className={`w-2 h-2 rounded-full ${isSelected ? 'bg-amber-400' : 'bg-slate-400'
+                          className={`w-2.5 h-2.5 rounded-full ${isSelected ? 'bg-[#DDBB70] ring-2 ring-[#DDBB70]/30' : 'border border-slate-300 bg-transparent'
                             }`}
                         />
-                        {forma.nome}
+                        <span>{forma.nome}</span>
                       </span>
                       <span
-                        className={`text-[10px] px-1.5 py-0.5 rounded ${isSelected ? 'bg-slate-800 text-amber-300' : 'bg-slate-200 text-slate-600'
+                        className={`text-[10px] px-2 py-0.5 rounded-md font-semibold ${isSelected
+                          ? 'bg-[#273852] text-[#DDBB70]'
+                          : 'bg-[#EBE4D5]/80 text-[#7A6843]'
                           }`}
                       >
                         {forma.badgeLabel}
@@ -298,12 +314,12 @@ export default function RitosMissaPage() {
               </div>
             </div>
 
-            {/* 2. Tempo Litúrgico */}
+            {/* BLOCO 2: TEMPO LITÚRGICO */}
             <div className="space-y-2">
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 text-amber-600" /> Tempo Litúrgico
+              <label className="text-[11px] font-bold uppercase tracking-wider text-[#17243A] flex items-center gap-2">
+                <Clock className="w-3.5 h-3.5 text-[#9A6F20]" /> TEMPO LITÚRGICO
               </label>
-              <div className="grid grid-cols-2 gap-1.5 bg-slate-100 p-1.5 rounded-xl">
+              <div className="bg-[#F3EEE3] p-2 rounded-2xl grid grid-cols-2 gap-1.5 border border-[#EBE4D5]">
                 {Object.values(TEMPOS_LITURGICOS_OPTIONS).map((tempo) => {
                   const isSelected = filtrosSelecionados.tempo === tempo.id;
                   return (
@@ -313,9 +329,9 @@ export default function RitosMissaPage() {
                       onClick={() =>
                         setFiltrosSelecionados((prev) => ({ ...prev, tempo: tempo.id }))
                       }
-                      className={`px-3 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer border ${isSelected
-                        ? `${tempo.corLiturgica.badgeBg} ${tempo.corLiturgica.badgeText} ${tempo.corLiturgica.badgeBorder} shadow-xs font-bold`
-                        : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                      className={`px-3 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer ${isSelected
+                        ? 'bg-[#EEDBB5] text-[#17243A] border border-[#D8C29A] shadow-xs font-bold'
+                        : 'bg-white/70 hover:bg-white text-[#4A5568] border border-transparent font-medium'
                         }`}
                     >
                       <span className={`w-2.5 h-2.5 rounded-full ${tempo.corLiturgica.dotBg}`} />
@@ -326,12 +342,12 @@ export default function RitosMissaPage() {
               </div>
             </div>
 
-            {/* 3. Grau da Celebração (Opcional / Todos) */}
+            {/* BLOCO 3: GRAU DA CELEBRAÇÃO*/}
             <div className="space-y-2">
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
-                <Calendar className="w-3.5 h-3.5 text-amber-600" /> Grau da Celebração (Opcional)
+              <label className="text-[11px] font-bold uppercase tracking-wider text-[#17243A] flex items-center gap-2">
+                <Calendar className="w-3.5 h-3.5 text-[#9A6F20]" /> TIPO DE CELEBRAÇÃO
               </label>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 bg-slate-100 p-1.5 rounded-xl">
+              <div className="bg-[#F3EEE3] p-2 rounded-2xl grid grid-cols-3 gap-1.5 border border-[#EBE4D5]">
                 {GRAUS_CELEBRACAO_OPTIONS.map((grau) => {
                   const isSelected = (filtrosSelecionados.grau || 'todos') === grau.id;
                   return (
@@ -344,9 +360,9 @@ export default function RitosMissaPage() {
                           grau: grau.id as GrauCelebracao | 'todos'
                         }))
                       }
-                      className={`px-2.5 py-2 rounded-lg text-xs font-medium transition-all text-center truncate cursor-pointer ${isSelected
-                        ? 'bg-slate-900 text-amber-400 font-bold shadow-xs'
-                        : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
+                      className={`px-2 py-2.5 rounded-xl text-xs transition-all text-center truncate cursor-pointer ${isSelected
+                        ? 'bg-[#17243A] text-white font-bold shadow-xs'
+                        : 'bg-white/70 hover:bg-white text-[#4A5568] border border-transparent font-medium'
                         }`}
                     >
                       {grau.nome}
@@ -358,151 +374,158 @@ export default function RitosMissaPage() {
 
           </div>
 
-          {/* Botão de Pesquisa Explicito */}
-          <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+          {/* RODAPÉ DO PAINEL DE FILTROS: REDEFINIR E BOTÃO DE PESQUISA */}
+          <div className="flex items-center justify-between pt-3 border-t border-[#E5D8BE]/60">
             <button
               type="button"
               onClick={handleResetFiltros}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold text-[#7A6843] hover:text-[#17243A] transition-all cursor-pointer"
             >
-              <RotateCcw className="w-3.5 h-3.5" />
+              <RotateCcw className="w-3.5 h-3.5 text-[#7A6843]" />
               <span>Redefinir Filtros</span>
             </button>
 
+            {/* 4. BOTÃO PESQUISAR / BUSCAR CELEBRAÇÕES COM GRADIENTE */}
             <button
               type="button"
               onClick={handlePesquisar}
-              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold bg-slate-900 hover:bg-slate-800 text-amber-400 shadow-md hover:shadow-lg transition-all cursor-pointer"
+              className="inline-flex items-center gap-2 px-7 py-3 rounded-full text-xs sm:text-sm font-bold tracking-wider bg-gradient-to-r from-[#17243A] to-[#223451] hover:from-[#1E2E4A] hover:to-[#2A4165] text-[#DDBB70] shadow-md hover:shadow-lg transition-all cursor-pointer border border-[#DDBB70]/30"
             >
-              <Search className="w-4 h-4 text-amber-400" />
-              <span>[ Pesquisar / Buscar Celebrações ]</span>
+              <Search className="w-4 h-4 text-[#DDBB70]" />
+              <span>PESQUISAR / BUSCAR CELEBRAÇÕES</span>
             </button>
           </div>
         </section>
 
-        {/* LAYOUT PRINCIPAL EM 2 COLUNAS */}
+        {/* LAYOUT EM 2 COLUNAS: LISTA DE CARDS (ESQUERDA) + PAINEL LATERAL (DIREITA) */}
         <div className="flex flex-col md:flex-row gap-6 items-start">
 
-          {/* COLUNA PRINCIPAL: LISTA DE CELEBRAÇÕES ENCONTRADAS */}
-          <div className="flex-1 w-full space-y-8">
+          {/* COLUNA PRINCIPAL: LISTA DE CELEBRAÇÕES */}
+          <div className="flex-1 w-full space-y-6">
 
-            {/* Estado Amigável de "Nenhuma celebração encontrada" */}
             {resultadosBusca.length === 0 ? (
-              <div className="bg-white border border-slate-200 rounded-2xl p-8 sm:p-12 text-center space-y-4 shadow-sm">
-                <div className="w-16 h-16 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center mx-auto shadow-inner">
+              /* Nenhuma celebração encontrada */
+              <div className="bg-[#FFFCF6] border border-[#E5D8BE] rounded-3xl p-8 sm:p-12 text-center space-y-4 shadow-sm">
+                <div className="w-16 h-16 rounded-full bg-[#F3EEE3] text-[#9A6F20] flex items-center justify-center mx-auto border border-[#E5D8BE]">
                   <Filter className="w-8 h-8" />
                 </div>
                 <div className="space-y-1.5 max-w-md mx-auto">
-                  <h3 className="text-xl font-bold font-serif text-slate-900">
+                  <h3 className="text-xl font-bold font-serif text-[#17243A]">
                     Nenhuma celebração encontrada para estes filtros
                   </h3>
-                  <p className="text-xs text-slate-600 leading-relaxed">
+                  <p className="text-xs text-[#5F6B7A] leading-relaxed">
                     Tente selecionar um grau diferente (ex: "Todos os Graus") ou alterar o Tempo Litúrgico para visualizar as celebrações cadastradas.
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={handleResetFiltros}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 text-amber-400 hover:bg-slate-800 transition-all cursor-pointer"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold bg-[#17243A] text-[#DDBB70] hover:bg-[#1E2E4A] transition-all cursor-pointer border border-[#DDBB70]/30"
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
                   <span>Restaurar Filtros Padrão</span>
                 </button>
               </div>
             ) : (
-              /* CARD CONTAINER PRINCIPAL DA CELEBRAÇÃO */
+              /* CARDS DAS CELEBRAÇÕES */
               resultadosBusca.map((celebracao) => {
                 const tempoInfo = TEMPOS_LITURGICOS_OPTIONS[celebracao.tempoLiturgico] || TEMPOS_LITURGICOS_OPTIONS.quaresma;
                 const formaInfo = FORMAS_CELEBRACAO_OPTIONS.find((f) => f.id === celebracao.forma) || FORMAS_CELEBRACAO_OPTIONS[0];
                 const isCelebracaoOpen = openCelebracaoIds.has(celebracao.id);
 
-                // Cálculo dos metadados estatísticos da celebração
                 const totalPassosCelebracao =
                   (celebracao.ritos?.iniciais?.length || 0) +
                   (celebracao.ritos?.palavra?.length || 0) +
                   (celebracao.ritos?.eucaristica?.length || 0) +
                   (celebracao.ritos?.finais?.length || 0);
 
+                const displayImage = celebracao.imageUrl || celebracao.imagem || '/images/quaresma.jpg';
+
                 return (
                   <article
                     key={celebracao.id}
-                    className="bg-white border border-slate-200 rounded-2xl shadow-sm hover:shadow-md transition-all overflow-hidden"
+                    className="bg-[#FFFCF6] border border-[#E5D8BE] rounded-3xl p-5 shadow-sm hover:shadow-md transition-all space-y-4 relative overflow-hidden"
                   >
-                    {/* Cabeçalho do Card Principal da Celebração (Accordion Pai) */}
-                    <button
-                      type="button"
-                      onClick={() => toggleCelebracao(celebracao.id)}
-                      className="w-full bg-slate-900 hover:bg-slate-850 text-white p-5 sm:p-6 transition-colors space-y-4 text-left border-b border-slate-800 cursor-pointer group"
-                      aria-expanded={isCelebracaoOpen}
-                    >
-                      <div className="flex flex-wrap items-center justify-between gap-3">
+                    {/* PARTE VISÍVEL DO CARD */}
+                    <div className="flex flex-col sm:flex-row gap-5 items-start">
+
+                      {/* THUMBNAIL DA CELEBRAÇÃO (ESQUERDA) */}
+                      <div className="relative w-full sm:w-36 h-36 rounded-2xl overflow-hidden flex-shrink-0 bg-[#F3EEE3] border border-[#E5D8BE]/70 shadow-xs">
+                        <Image
+                          src={displayImage}
+                          alt={celebracao.nome}
+                          fill
+                          className="object-cover object-center"
+                          sizes="(max-width: 640px) 100vw, 144px"
+                        />
+                      </div>
+
+                      {/* INFORMACÕES CENTRAIS */}
+                      <div className="flex-1 space-y-2 w-full">
+
+                        {/* BADGES SUPERIORES */}
                         <div className="flex flex-wrap items-center gap-2">
-                          {/* Liturgical Color Badge */}
-                          <span
-                            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border shadow-xs ${tempoInfo.corLiturgica.badgeBg} ${tempoInfo.corLiturgica.badgeText} ${tempoInfo.corLiturgica.badgeBorder}`}
-                          >
-                            <span
-                              className={`w-2 h-2 rounded-full ${tempoInfo.corLiturgica.dotBg}`}
-                            />
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-[#F5EEFB] text-[#6B21A8] border border-[#E9D5FF]">
+                            <span className="w-2 h-2 rounded-full bg-[#7B1FA2]" />
                             Tempo: {tempoInfo.nome} ({tempoInfo.corLiturgica.name})
                           </span>
 
-                          {/* Grau Badge */}
-                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-800 text-amber-300 border border-slate-700">
-                            <Calendar className="w-3 h-3 text-amber-400" />
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold bg-[#F5EFE6] text-[#7A6843] border border-[#E5D8BE]">
+                            <Calendar className="w-3 h-3 text-[#7A6843]" />
                             Grau: {celebracao.grauCelebracao.toUpperCase()}
                           </span>
 
-                          {/* Forma Badge */}
-                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-800 text-slate-300 border border-slate-700">
-                            <Sparkles className="w-3 h-3 text-amber-400" />
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold bg-[#F5EFE6] text-[#7A6843] border border-[#E5D8BE]">
+                            <Sparkles className="w-3 h-3 text-[#7A6843]" />
                             {formaInfo.nome}
                           </span>
                         </div>
 
-                        {/* Badge de Contagem Total de Passos */}
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-800/80 text-amber-400 border border-amber-500/30">
-                          <ListOrdered className="w-3.5 h-3.5 text-amber-400" />
+                        {/* TÍTULO DA CELEBRAÇÃO */}
+                        <h3 className="text-2xl sm:text-3xl font-bold font-serif text-[#9A6F20] tracking-tight pt-1">
+                          {celebracao.nome}
+                        </h3>
+
+                        {/* DESCRIÇÃO */}
+                        {celebracao.descricaoBreve && (
+                          <p className="text-[#5F6B7A] text-xs sm:text-sm leading-relaxed">
+                            {celebracao.descricaoBreve}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* LADO DIREITO DO CARD */}
+                      <div className="flex flex-row sm:flex-col items-end justify-between sm:justify-between w-full sm:w-auto h-full gap-3 flex-shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-[#E5D8BE]/40">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-[#F5EFE6] text-[#7A6843] border border-[#E5D8BE]">
+                          <ListOrdered className="w-3.5 h-3.5 text-[#7A6843]" />
                           <span>{totalPassosCelebracao} passos litúrgicos</span>
                         </span>
-                      </div>
 
-                      <div className="flex items-center justify-between gap-4">
-                        <div className="space-y-1">
-                          <h2 className="text-2xl sm:text-3xl font-bold font-serif text-amber-400 tracking-wide group-hover:text-amber-300 transition-colors">
-                            {celebracao.nome}
-                          </h2>
-
-                          {celebracao.descricaoBreve && (
-                            <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
-                              {celebracao.descricaoBreve}
-                            </p>
-                          )}
-                        </div>
-
-                        {/* Indicador Visual do Accordion Pai */}
-                        <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs font-semibold text-slate-200 group-hover:border-amber-500/40 group-hover:text-white transition-all flex-shrink-0">
-                          <span className="hidden sm:inline">
-                            {isCelebracaoOpen ? 'Recolher Ritos' : 'Ver Ritos Litúrgicos'}
-                          </span>
+                        <button
+                          type="button"
+                          onClick={() => toggleCelebracao(celebracao.id)}
+                          className="inline-flex items-center gap-1 px-4 py-1.5 rounded-full text-xs font-semibold bg-[#F5EFE6] hover:bg-[#EEDBB5] text-[#5F6B7A] hover:text-[#17243A] border border-[#E5D8BE] transition-all cursor-pointer shadow-2xs"
+                          aria-expanded={isCelebracaoOpen}
+                        >
+                          <span>{isCelebracaoOpen ? 'Recolher Ritos' : 'Ver Ritos Litúrgicos'}</span>
                           <ChevronDown
-                            className={`w-4 h-4 text-amber-400 transition-transform duration-300 ease-in-out ${isCelebracaoOpen ? 'rotate-180' : 'rotate-0'
+                            className={`w-3.5 h-3.5 text-[#7A6843] transition-transform duration-300 ${isCelebracaoOpen ? 'rotate-180' : '-rotate-90'
                               }`}
                           />
-                        </div>
+                        </button>
                       </div>
-                    </button>
 
-                    {/* WRAPPER COM ANIMAÇÃO SUAVE DE EXPANSÃO/RECOLHIMENTO DO ACCORDION PAI */}
+                    </div>
+
+                    {/* WRAPPER ACCORDION DOS RITOS DETALHADOS */}
                     <div
                       className={`grid transition-all duration-300 ease-in-out ${isCelebracaoOpen
-                        ? 'grid-rows-[1fr] opacity-100'
+                        ? 'grid-rows-[1fr] opacity-100 pt-4 border-t border-[#E5D8BE]/60'
                         : 'grid-rows-[0fr] opacity-0 overflow-hidden'
                         }`}
                     >
                       <div className="overflow-hidden">
-                        {/* CONTEÚDO DOS 4 GRANDES GRUPOS DE RITOS */}
-                        <div className="p-5 sm:p-6 space-y-6">
+                        <div className="space-y-4">
                           {(['estruturaCelebracao', 'iniciais', 'palavra', 'eucaristica', 'finais', 'ritosDevocionais'] as GrupoRito[]).map(
                             (grupoKey) => {
                               const passosDoGrupo = celebracao.ritos[grupoKey];
@@ -515,44 +538,42 @@ export default function RitosMissaPage() {
                               return (
                                 <section
                                   key={grupoKey}
-                                  className="border border-slate-200 rounded-2xl overflow-hidden bg-slate-50/50 space-y-0 shadow-2xs"
+                                  className="border border-[#E5D8BE] rounded-2xl overflow-hidden bg-[#FAF7F0] space-y-0"
                                 >
-                                  {/* ACCORDION DO GRUPO DE RITO (FILHO 1) */}
                                   <button
                                     type="button"
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       toggleGroup(celebracao.id, grupoKey);
                                     }}
-                                    className="w-full bg-slate-100 hover:bg-slate-200/80 text-slate-900 p-4 font-bold flex items-center justify-between transition-all cursor-pointer text-left border-b border-slate-200"
+                                    className="w-full bg-[#F5EFE6] hover:bg-[#EEDBB5]/70 text-[#17243A] p-4 font-bold flex items-center justify-between transition-all cursor-pointer text-left border-b border-[#E5D8BE]"
                                     aria-expanded={isGroupOpen}
                                   >
                                     <div className="flex items-center gap-3">
-                                      <div className="w-8 h-8 rounded-xl bg-slate-900 text-amber-400 flex items-center justify-center font-bold shadow-xs">
+                                      <div className="w-8 h-8 rounded-xl bg-[#17243A] text-[#DDBB70] flex items-center justify-center font-bold shadow-xs">
                                         <DynamicIcon name={grupoInfo.iconName} className="w-4 h-4" />
                                       </div>
                                       <div>
-                                        <h3 className="text-base font-serif font-bold text-slate-900">
+                                        <h4 className="text-base font-serif font-bold text-[#17243A]">
                                           {grupoInfo.nome}
-                                        </h3>
-                                        <p className="text-xs text-slate-500 font-sans font-normal">
+                                        </h4>
+                                        <p className="text-xs text-[#7A6843] font-sans font-normal">
                                           {grupoInfo.descricao}
                                         </p>
                                       </div>
                                     </div>
 
                                     <div className="flex items-center gap-2">
-                                      <span className="px-2.5 py-1 rounded-md bg-white border border-slate-300 text-slate-700 text-xs font-semibold">
+                                      <span className="px-2.5 py-1 rounded-full bg-white border border-[#E5D8BE] text-[#7A6843] text-xs font-semibold">
                                         {passosDoGrupo.length} passos
                                       </span>
                                       <ChevronDown
-                                        className={`w-5 h-5 text-amber-600 transition-transform duration-300 ${isGroupOpen ? 'rotate-180 text-amber-600' : 'rotate-0 text-slate-400'
+                                        className={`w-5 h-5 text-[#9A6F20] transition-transform duration-300 ${isGroupOpen ? 'rotate-180' : 'rotate-0'
                                           }`}
                                       />
                                     </div>
                                   </button>
 
-                                  {/* LISTA DOS PASSOS DO GRUPO COM TRANSIÇÃO SUAVE */}
                                   <div
                                     className={`grid transition-all duration-300 ease-in-out ${isGroupOpen
                                       ? 'grid-rows-[1fr] opacity-100'
@@ -568,52 +589,48 @@ export default function RitosMissaPage() {
                                           return (
                                             <article
                                               key={passo.id}
-                                              className="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 shadow-xs space-y-3"
+                                              className="bg-[#FFFCF6] border border-[#E5D8BE] rounded-xl p-4 sm:p-5 shadow-2xs space-y-3"
                                             >
-                                              {/* Cabeçalho do Passo com Botão Recolher/Detalhes */}
                                               <div className="flex items-start justify-between gap-3">
                                                 <div className="space-y-1">
                                                   <div className="flex items-center gap-2">
-                                                    <span className="px-2.5 py-0.5 rounded-md bg-amber-500/10 text-amber-900 border border-amber-500/20 text-xs font-bold">
+                                                    <span className="px-2.5 py-0.5 rounded-full bg-[#F5E6CA] text-[#7A5A18] border border-[#D8C29A] text-[11px] font-bold">
                                                       Passo #{passo.numero}
                                                     </span>
                                                   </div>
-                                                  <h4 className="text-base font-bold font-serif text-slate-900">
+                                                  <h5 className="text-base font-bold font-serif text-[#17243A]">
                                                     {passo.titulo}
-                                                  </h4>
+                                                  </h5>
                                                   {passo.subTitulo && (
-                                                    <p className="text-xs font-semibold text-amber-700">
+                                                    <p className="text-xs font-semibold text-[#9A6F20]">
                                                       {passo.subTitulo}
                                                     </p>
                                                   )}
                                                 </div>
 
-                                                {/* BOTÃO EXPANDIR / RECOLHER PASSO INDIVIDUAL (FILHO 2) */}
                                                 <button
                                                   type="button"
                                                   onClick={(e) => {
                                                     e.stopPropagation();
                                                     toggleStep(celebracao.id, passo.id);
                                                   }}
-                                                  className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer flex-shrink-0"
+                                                  className="px-3 py-1.5 rounded-full bg-[#F5EFE6] hover:bg-[#EEDBB5] text-[#5F6B7A] hover:text-[#17243A] text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer flex-shrink-0 border border-[#E5D8BE]"
                                                   aria-expanded={isStepOpen}
                                                 >
                                                   <span>{isStepOpen ? 'Recolher' : 'Detalhes'}</span>
                                                   <ChevronDown
-                                                    className={`w-3.5 h-3.5 transition-transform duration-300 ${isStepOpen ? 'rotate-180 text-amber-600' : 'rotate-0 text-slate-400'
+                                                    className={`w-3.5 h-3.5 text-[#7A6843] transition-transform duration-300 ${isStepOpen ? 'rotate-180' : 'rotate-0'
                                                       }`}
                                                   />
                                                 </button>
                                               </div>
 
-                                              {/* Descrição Curta do Passo */}
                                               {passo.descricao && (
-                                                <p className="text-slate-700 text-xs sm:text-sm leading-relaxed">
+                                                <p className="text-[#5F6B7A] text-xs sm:text-sm leading-relaxed">
                                                   {passo.descricao}
                                                 </p>
                                               )}
 
-                                              {/* CONTEÚDO DETALHADO DO PASSO COM TRANSIÇÃO SUAVE */}
                                               <div
                                                 className={`grid transition-all duration-300 ease-in-out ${isStepOpen
                                                   ? 'grid-rows-[1fr] opacity-100'
@@ -621,29 +638,27 @@ export default function RitosMissaPage() {
                                                   }`}
                                               >
                                                 <div className="overflow-hidden">
-                                                  <div className="space-y-4 pt-3 border-t border-slate-100">
+                                                  <div className="space-y-4 pt-3 border-t border-[#E5D8BE]/50">
 
-                                                    {/* Rubrica Litúrgica Destaque */}
                                                     {passo.rubrica && (
-                                                      <div className="bg-amber-50/70 border-l-4 border-amber-500 text-amber-950 p-3.5 rounded-r-xl text-xs sm:text-sm font-serif italic space-y-1">
-                                                        <div className="font-sans font-bold not-italic text-amber-800 text-xs uppercase tracking-wider flex items-center gap-1">
+                                                      <div className="bg-[#FAF4E8] border-l-4 border-[#9A6F20] text-[#5C4312] p-3.5 rounded-r-xl text-xs sm:text-sm font-serif italic space-y-1">
+                                                        <div className="font-sans font-bold not-italic text-[#9A6F20] text-xs uppercase tracking-wider flex items-center gap-1">
                                                           <span>❖ Rubrica Litúrgica</span>
                                                         </div>
                                                         <p>{passo.rubrica}</p>
                                                       </div>
                                                     )}
 
-                                                    {/* Diálogos / Textos da Celebração */}
                                                     {passo.textos && passo.textos.length > 0 && (
-                                                      <div className="space-y-2 bg-slate-50 border border-slate-200 rounded-xl p-3.5">
-                                                        <h5 className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1">
-                                                          <FileText className="w-3.5 h-3.5 text-amber-600" /> Diálogo / Textos Litúrgicos
-                                                        </h5>
+                                                      <div className="space-y-2 bg-[#F5EFE6]/50 border border-[#E5D8BE] rounded-xl p-3.5">
+                                                        <h6 className="text-xs font-bold uppercase tracking-wider text-[#7A6843] flex items-center gap-1">
+                                                          <FileText className="w-3.5 h-3.5 text-[#9A6F20]" /> Diálogo / Textos Litúrgicos
+                                                        </h6>
                                                         <div className="space-y-1.5">
                                                           {passo.textos.map((txt, tIdx) => (
                                                             <p
                                                               key={tIdx}
-                                                              className="text-slate-700 text-xs sm:text-sm font-serif leading-relaxed"
+                                                              className="text-[#26364D] text-xs sm:text-sm font-serif leading-relaxed"
                                                             >
                                                               {txt}
                                                             </p>
@@ -652,19 +667,18 @@ export default function RitosMissaPage() {
                                                       </div>
                                                     )}
 
-                                                    {/* Elementos e Gestos Principais */}
                                                     {passo.items && passo.items.length > 0 && (
                                                       <div className="space-y-2">
-                                                        <h5 className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1">
-                                                          <CheckCircle2 className="w-3.5 h-3.5 text-amber-600" /> Elementos e Gestos Principais
-                                                        </h5>
+                                                        <h6 className="text-xs font-bold uppercase tracking-wider text-[#7A6843] flex items-center gap-1">
+                                                          <CheckCircle2 className="w-3.5 h-3.5 text-[#9A6F20]" /> Elementos e Gestos Principais
+                                                        </h6>
                                                         <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                                           {passo.items.map((item, iIdx) => (
                                                             <li
                                                               key={iIdx}
-                                                              className="flex items-start gap-2 text-slate-700 text-xs sm:text-sm"
+                                                              className="flex items-start gap-2 text-[#4A5568] text-xs sm:text-sm"
                                                             >
-                                                              <CheckCircle2 className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+                                                              <CheckCircle2 className="w-4 h-4 text-[#9A6F20] flex-shrink-0 mt-0.5" />
                                                               <span>{item}</span>
                                                             </li>
                                                           ))}
@@ -672,12 +686,11 @@ export default function RitosMissaPage() {
                                                       </div>
                                                     )}
 
-                                                    {/* Mídia Demonstrativa (Imagem / Vídeo) */}
                                                     {passo.media && (
                                                       <div className="pt-2">
-                                                        <h5 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2 flex items-center gap-1">
-                                                          <Sparkles className="w-3.5 h-3.5 text-amber-600" /> Mídia Demonstrativa
-                                                        </h5>
+                                                        <h6 className="text-xs font-bold uppercase tracking-wider text-[#7A6843] mb-2 flex items-center gap-1">
+                                                          <Sparkles className="w-3.5 h-3.5 text-[#9A6F20]" /> Mídia Demonstrativa
+                                                        </h6>
                                                         <MediaRenderer media={passo.media} />
                                                       </div>
                                                     )}
@@ -705,63 +718,65 @@ export default function RitosMissaPage() {
 
           </div>
 
-          {/* COLUNA LATERAL DIREITA: ÍNDICE SEQUENCIAL E DIRETÓRIO (Desktop md:) */}
-          <aside className="w-full md:w-80 flex-shrink-0 space-y-6 md:sticky md:top-20">
+          {/* SIDEBAR / PAINEL LATERAL (DIREITA) */}
+          <aside className="w-full md:w-80 flex-shrink-0 space-y-5 md:sticky md:top-20">
 
-
-            {/* Cartão de Estado da Busca Atual */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-3">
-              <div className="flex items-center gap-2 font-bold text-xs uppercase tracking-wider text-amber-700">
-                <Sparkles className="w-4 h-4 text-amber-600" /> Configuração Litúrgica Ativa
+            {/* CARD 1: CONFIGURAÇÃO LITÚRGICA ATIVA */}
+            <div className="bg-[#FFFCF6] border border-[#E5D8BE] rounded-3xl p-5 shadow-sm space-y-3.5">
+              <div className="flex items-center gap-2 font-serif font-bold text-xs uppercase tracking-wider text-[#17243A]">
+                <span className="text-[#9A6F20] text-sm">❖</span>
+                <span>CONFIGURAÇÃO LITÚRGICA ATIVA</span>
               </div>
 
-              <div className="space-y-2 text-xs text-slate-700 border-t border-slate-100 pt-3">
+              <div className="space-y-2.5 text-xs text-[#5F6B7A] border-t border-[#E5D8BE]/50 pt-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-slate-500">Forma:</span>
-                  <strong className="text-slate-900 font-semibold">{formaAtivaOption.nome}</strong>
+                  <span>Forma:</span>
+                  <strong className="text-[#17243A] font-semibold">{formaAtivaOption.nome}</strong>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-slate-500">Tempo:</span>
-                  <strong className="text-slate-900 font-semibold">{tempoAtivoMetadata.nome}</strong>
+                  <span>Tempo:</span>
+                  <strong className="text-[#17243A] font-semibold">{tempoAtivoMetadata.nome}</strong>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-slate-500">Grau:</span>
-                  <strong className="text-slate-900 font-semibold uppercase">
-                    {filtrosPesquisados.grau || 'todos'}
+                  <span>Grau:</span>
+                  <strong className="text-[#17243A] font-semibold uppercase">
+                    {filtrosPesquisados.grau || 'TODOS'}
                   </strong>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-500">Celebrações:</span>
-                  <span className="font-bold px-2 py-0.5 rounded-md text-[11px] bg-slate-900 text-amber-400">
+                <div className="flex justify-between items-center pt-1">
+                  <span>Celebrações:</span>
+                  <span className="font-bold px-3 py-1 rounded-full text-[11px] bg-[#B89B5E] text-white shadow-2xs">
                     {resultadosBusca.length} encontrada(s)
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* Cartão de Navegação para Ritos Complementares */}
-            <div className="bg-slate-900 text-white rounded-2xl p-5 shadow-md border border-slate-800 space-y-3">
-              <div className="font-semibold text-xs uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
-                <Church className="w-4 h-4 text-amber-400" /> Diretório Litúrgico
+            {/* CARD 2: DIRETÓRIO LITÚRGICO (AZUL-MARINHO COM GRADIENTE) */}
+            <div className="bg-gradient-to-b from-[#17243A] to-[#121D2F] text-white rounded-3xl p-5 shadow-md border border-[#233550] space-y-4 relative overflow-hidden">
+              <div className="font-serif font-bold text-xs uppercase tracking-wider text-[#DDBB70] flex items-center gap-2">
+                <Church className="w-4 h-4 text-[#DDBB70]" />
+                <span>DIRETÓRIO LITÚRGICO</span>
               </div>
-              <p className="text-xs text-slate-300 leading-relaxed">
+              <p className="text-xs text-[#A0B0C6] leading-relaxed">
                 Navegue pelos Ritos Complementares e Sacramentais do Ritual Romano.
               </p>
 
-              <div className="space-y-2 pt-2">
+              <div className="space-y-2.5 pt-1">
+                {/* 4. BOTÃO RITOS COMPLEMENTARES COM GRADIENTE DOURADO REFINADO */}
                 <Link
                   href="/ritos-complementares"
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 transition-all shadow-sm cursor-pointer"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-full text-xs font-semibold bg-gradient-to-r from-[#DDBB70] via-[#C69A3A] to-[#DDBB70] text-[#17243A] shadow-sm hover:opacity-95 transition-all cursor-pointer"
                 >
-                  <BookOpen className="w-4 h-4" />
+                  <BookOpen className="w-4 h-4 text-[#17243A]" />
                   <span>Ritos Complementares</span>
                 </Link>
 
                 <Link
                   href="/"
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-all cursor-pointer"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-full text-xs font-semibold text-[#8BA1C1] hover:text-white bg-[#111B2C] hover:bg-[#0C1422] border border-[#233550] transition-all cursor-pointer"
                 >
-                  <ArrowLeft className="w-4 h-4" />
+                  <ArrowLeft className="w-3.5 h-3.5" />
                   <span>Voltar para a Página Inicial</span>
                 </Link>
               </div>
