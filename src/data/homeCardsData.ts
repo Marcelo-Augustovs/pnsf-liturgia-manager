@@ -18,7 +18,8 @@ export const CARDS_DATA: CardItem[] = [
         id: "sacristia",
         title: "SACRISTIA",
         description: "Organização das alfaias, vasos sagrados e paramentos das cores litúrgicas.",
-        imageUrl: "/images/sacristia.webp"
+        imageUrl: "/images/sacristia.webp",
+        pageReference: "/sacristia"
     },
     {
         id: "complementares",
