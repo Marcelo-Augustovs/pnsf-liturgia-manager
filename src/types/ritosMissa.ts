@@ -4,7 +4,7 @@ export type TempoLiturgico = 'quaresma' | 'pascal' | 'comum' | 'advento';
 
 export type GrauCelebracao = 'solenidade' | 'festa' | 'memoria' | 'datas_moveis' | 'domingo';
 
-export type GrupoRito = 'iniciais' | 'palavra' | 'eucaristica' | 'finais';
+export type GrupoRito = 'iniciais' | 'palavra' | 'eucaristica' | 'finais' | 'ritosDevocionais' | 'estruturaCelebracao';
 
 export interface MediaContent {
   type: 'image' | 'video';
@@ -30,6 +30,8 @@ export interface RitosGrupos {
   palavra: PassoRito[];
   eucaristica: PassoRito[];
   finais: PassoRito[];
+  ritosDevocionais?: PassoRito[];
+  estruturaCelebracao?: PassoRito[];
 }
 
 export interface Celebracao {

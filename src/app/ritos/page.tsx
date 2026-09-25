@@ -503,7 +503,7 @@ export default function RitosMissaPage() {
                       <div className="overflow-hidden">
                         {/* CONTEÚDO DOS 4 GRANDES GRUPOS DE RITOS */}
                         <div className="p-5 sm:p-6 space-y-6">
-                          {(['iniciais', 'palavra', 'eucaristica', 'finais'] as GrupoRito[]).map(
+                          {(['estruturaCelebracao', 'iniciais', 'palavra', 'eucaristica', 'finais', 'ritosDevocionais'] as GrupoRito[]).map(
                             (grupoKey) => {
                               const passosDoGrupo = celebracao.ritos[grupoKey];
                               const grupoInfo = GRUPOS_RITO_INFO[grupoKey];

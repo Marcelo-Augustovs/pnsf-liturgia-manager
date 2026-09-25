@@ -100,6 +100,12 @@ export const GRAUS_CELEBRACAO_OPTIONS: GrauCelebracaoOption[] = [
 ];
 
 export const GRUPOS_RITO_INFO: Record<string, GrupoRitoInfo> = {
+  estruturaCelebracao: {
+    id: 'estruturaCelebracao',
+    nome: 'Estrutura da Celebração',
+    descricao: 'Estrutura da Celebração',
+    iconName: 'Layers'
+  },
   iniciais: {
     id: 'iniciais',
     nome: 'Ritos Iniciais',
@@ -123,6 +129,12 @@ export const GRUPOS_RITO_INFO: Record<string, GrupoRitoInfo> = {
     nome: 'Ritos Finais',
     descricao: 'Avisos pastorais, Bênção Solene e envio dos fiéis em missão.',
     iconName: 'CheckCircle2'
+  },
+  ritosDevocionais: {
+    id: 'ritosDevocionais',
+    nome: 'Ritos Devocionais',
+    descricao: 'Ritos Devocionais',
+    iconName: 'Heart'
   }
 };
 
@@ -278,6 +290,23 @@ export const CELEBRACOES_DATA: Celebracao[] = [
           iconName: 'BookOpen'
         }
       ],
+      ritosDevocionais: [
+        {
+          id: '1_dom_quar_ritos_devocionais',
+          numero: 8,
+          titulo: 'Ritos Devocionais',
+          subTitulo: 'Ritos Devocionais',
+          descricao: 'Ritos Devocionais',
+          rubrica: 'Ritos Devocionais',
+          textos: [
+            'Ritos Devocionais'
+          ],
+          items: [
+            'Ritos Devocionais'
+          ],
+          iconName: 'Sparkles'
+        }
+      ],
       eucaristica: [
         {
           id: '1_dom_quar_ofertorio',
@@ -359,6 +388,30 @@ export const CELEBRACOES_DATA: Celebracao[] = [
             'Veneração final do Altar'
           ],
           iconName: 'Church'
+        }
+      ],
+      estruturaCelebracao: [
+        {
+          id: '1_dom_quar_estrutura',
+          numero: 1,
+          titulo: 'Estrutura da Celebração',
+          subTitulo: 'Estrutura da Celebração',
+          descricao: 'Estrutura da Celebração',
+          rubrica: 'Estrutura da Celebração',
+          textos: [
+            'Estrutura da Celebração',
+            'Estrutura da Celebração'
+          ],
+          items: [
+            'Estrutura da Celebração',
+            'Estrutura da Celebração'
+          ],
+          media: {
+            type: 'image',
+            url: 'https://images.unsplash.com/photo-1548625361-185966374a2b?q=80&w=1200&auto=format&fit=crop',
+            caption: 'Estrutura da Celebração'
+          },
+          iconName: 'Layers'
         }
       ]
     }
