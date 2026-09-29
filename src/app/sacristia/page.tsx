@@ -1,59 +1,74 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { SacristiaState, SacristiaCategoria } from '@/types/sacristia';
-import { INITIAL_SACRISTIA_DATA } from '@/data/mockSacristiaData';
 import { SacristiaHeader } from './components/SacristiaHeader';
 import { SacristiaSummary } from './components/SacristiaSummary';
 import { SacristiaAlerts } from './components/SacristiaAlerts';
 import { CategoriesGrid } from './components/CategoriesGrid';
-import { AlfaiasManager } from './components/AlfaiasManager';
-import { ConsumablesCard } from './components/ConsumablesCard';
-import { InventoryCard } from './components/InventoryCard';
+import { ModuleSkeleton } from './components/ModuleSkeleton';
 import {
   Church,
   Sparkles,
-  Info,
-  Layers,
   HeartHandshake,
   CheckCircle2,
+  ArrowLeft,
 } from 'lucide-react';
 
 const LOCAL_STORAGE_KEY = 'pnsf_sacristia_state_v1';
 
+// LAZY LOADING REAL DE COMPONENTES DE CATEGORIA COM NEXT/DYNAMIC
+const AlfaiasManager = dynamic(
+  () => import('./components/AlfaiasManager').then((mod) => mod.AlfaiasManager),
+  { loading: () => <ModuleSkeleton /> }
+);
+
+const ConsumablesCard = dynamic(
+  () => import('./components/ConsumablesCard').then((mod) => mod.ConsumablesCard),
+  { loading: () => <ModuleSkeleton /> }
+);
+
+const InventoryCard = dynamic(
+  () => import('./components/InventoryCard').then((mod) => mod.InventoryCard),
+  { loading: () => <ModuleSkeleton /> }
+);
+
+// MAPEO DE CARREGADORES ASSÍNCRONOS DE DADOS POR CATEGORIA (DATA SPLITTING)
+const categoryLoaders: Record<SacristiaCategoria, () => Promise<any>> = {
+  alfaias: () => import('./data/categories/alfaias'),
+  toalhas: () => import('./data/categories/toalhas'),
+  paramentos: () => import('./data/categories/paramentos'),
+  vasos: () => import('./data/categories/vasos'),
+  consumiveis: () => import('./data/categories/consumiveis'),
+  decoracao: () => import('./data/categories/decoracao'),
+};
+
 export default function SacristiaDashboardPage() {
-  const [sacristiaState, setSacristiaState] = useState<SacristiaState>(INITIAL_SACRISTIA_DATA);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [activeCategory, setActiveCategory] = useState<SacristiaCategoria | 'todas'>('todas');
+  // activeCategory inicia como null na Tela Inicial (Dashboard)
+  const [activeCategory, setActiveCategory] = useState<SacristiaCategoria | 'todas' | null>(null);
+  
+  // loadedCategoriesData armazena em memória apenas os dados das categorias baixadas
+  const [loadedCategoriesData, setLoadedCategoriesData] = useState<Partial<SacristiaState>>({});
+  
+  // loadingCategory indica qual categoria está sendo baixada sob demanda
+  const [loadingCategory, setLoadingCategory] = useState<SacristiaCategoria | 'todas' | null>(null);
+  
   const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
 
-  // Load state from localStorage on client render
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
-      if (saved) {
-        setSacristiaState(JSON.parse(saved));
-      }
-    } catch (e) {
-      console.error('Falha ao carregar estado da sacristia do localStorage', e);
-    } finally {
-      setIsLoaded(true);
-    }
-  }, []);
+  const moduleRef = useRef<HTMLDivElement>(null);
 
-  // Save state to localStorage whenever state changes
-  useEffect(() => {
-    if (isLoaded) {
-      try {
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(sacristiaState));
-      } catch (e) {
-        console.error('Falha ao salvar estado no localStorage', e);
+  // Scroll suave até o módulo recém-carregado
+  const scrollToModule = () => {
+    setTimeout(() => {
+      if (moduleRef.current) {
+        moduleRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
-    }
-  }, [sacristiaState, isLoaded]);
+    }, 120);
+  };
 
-  // Show temporary toast feedback
+  // Toast feedback
   const triggerToast = (msg: string) => {
     setFeedbackMessage(msg);
     setTimeout(() => {
@@ -61,34 +76,143 @@ export default function SacristiaDashboardPage() {
     }, 3500);
   };
 
+  // Auxiliar para salvar atualização no localStorage sem parsed total antecipado
+  const saveCategoryToLocalStorage = (updatedPartial: Partial<SacristiaState>) => {
+    try {
+      const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+      const existingObj = saved ? JSON.parse(saved) : {};
+      const newObj = { ...existingObj, ...updatedPartial };
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(newObj));
+    } catch (e) {
+      console.error('Falha ao salvar categoria no localStorage', e);
+    }
+  };
+
+  // FUNÇÃO PRINCIPAL DE SELEÇÃO E CARREGAMENTO SOB DEMANDA DE CATEGORIA (CACHE + ASYNC IMPORT)
+  const loadCategoryData = async (category: SacristiaCategoria | 'todas') => {
+    const categoriesToLoad: SacristiaCategoria[] =
+      category === 'todas'
+        ? ['alfaias', 'toalhas', 'paramentos', 'vasos', 'consumiveis', 'decoracao']
+        : [category];
+
+    // Ler localStorage silenciosamente se houver dados salvos para as categorias solicitadas
+    let savedLocalData: Partial<SacristiaState> = {};
+    try {
+      const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (saved) {
+        savedLocalData = JSON.parse(saved);
+      }
+    } catch (e) {
+      console.error('Erro ao ler localStorage', e);
+    }
+
+    const keyMap: Record<SacristiaCategoria, keyof SacristiaState> = {
+      alfaias: 'alfaias',
+      toalhas: 'toalhas',
+      paramentos: 'paramentos',
+      vasos: 'vasos',
+      consumiveis: 'consumiveis',
+      decoracao: 'decoracoes',
+    };
+
+    // Verificar quais categorias faltam na memória
+    const missingFromMemory = categoriesToLoad.filter(
+      (cat) => !loadedCategoriesData[keyMap[cat]]
+    );
+
+    if (missingFromMemory.length === 0) {
+      // Reutilização instantânea de Cache em memória!
+      setActiveCategory(category);
+      scrollToModule();
+      return;
+    }
+
+    const updates: Partial<SacristiaState> = {};
+    const missingFromBoth: SacristiaCategoria[] = [];
+
+    // Verificar se a categoria solicitada existe no localStorage
+    for (const cat of missingFromMemory) {
+      const stateKey = keyMap[cat];
+      if (savedLocalData[stateKey] && Array.isArray(savedLocalData[stateKey])) {
+        updates[stateKey] = savedLocalData[stateKey] as any;
+      } else {
+        missingFromBoth.push(cat);
+      }
+    }
+
+    // Se houver categorias sem dados em memória nem no localStorage, faz o import() assíncrono
+    if (missingFromBoth.length > 0) {
+      setLoadingCategory(category);
+      try {
+        for (const cat of missingFromBoth) {
+          const mod = await categoryLoaders[cat]();
+          if (cat === 'alfaias') updates.alfaias = mod.mockAlfaias;
+          if (cat === 'toalhas') updates.toalhas = mod.mockToalhas;
+          if (cat === 'paramentos') updates.paramentos = mod.mockParamentos;
+          if (cat === 'vasos') updates.vasos = mod.mockVasos;
+          if (cat === 'consumiveis') updates.consumiveis = mod.mockConsumiveis;
+          if (cat === 'decoracao') updates.decoracoes = mod.mockDecoracoes;
+        }
+      } catch (error) {
+        console.error('Erro ao carregar módulo de dados da categoria:', error);
+      } finally {
+        setLoadingCategory(null);
+      }
+    }
+
+    // Atualiza o cache em memória e o activeCategory
+    setLoadedCategoriesData((prev) => {
+      const nextState = { ...prev, ...updates };
+      saveCategoryToLocalStorage(nextState);
+      return nextState;
+    });
+
+    setActiveCategory(category);
+    scrollToModule();
+  };
+
   // State Updates Handlers
   const handleUpdateAlfaia = (updatedItem: any) => {
-    setSacristiaState((prev) => ({
-      ...prev,
-      alfaias: prev.alfaias.map((a) => (a.id === updatedItem.id ? updatedItem : a)),
-    }));
+    setLoadedCategoriesData((prev) => {
+      const newAlfaias = (prev.alfaias || []).map((a) =>
+        a.id === updatedItem.id ? updatedItem : a
+      );
+      const nextState = { ...prev, alfaias: newAlfaias };
+      saveCategoryToLocalStorage({ alfaias: newAlfaias });
+      return nextState;
+    });
     triggerToast(`Alfaia "${updatedItem.nome}" atualizada para: ${updatedItem.etapaLavagem}`);
   };
 
   const handleAddAlfaia = (newItem: any) => {
-    setSacristiaState((prev) => ({
-      ...prev,
-      alfaias: [newItem, ...prev.alfaias],
-    }));
+    setLoadedCategoriesData((prev) => {
+      const newAlfaias = [newItem, ...(prev.alfaias || [])];
+      const nextState = { ...prev, alfaias: newAlfaias };
+      saveCategoryToLocalStorage({ alfaias: newAlfaias });
+      return nextState;
+    });
     triggerToast(`Nova alfaia "${newItem.nome}" cadastrada com sucesso!`);
   };
 
   const handleUpdateConsumivel = (updatedItem: any) => {
-    setSacristiaState((prev) => ({
-      ...prev,
-      consumiveis: prev.consumiveis.map((c) => (c.id === updatedItem.id ? updatedItem : c)),
-    }));
+    setLoadedCategoriesData((prev) => {
+      const newConsumiveis = (prev.consumiveis || []).map((c) =>
+        c.id === updatedItem.id ? updatedItem : c
+      );
+      saveCategoryToLocalStorage({ consumiveis: newConsumiveis });
+      return { ...prev, consumiveis: newConsumiveis };
+    });
     triggerToast(`Estoque de "${updatedItem.nome}" reabastecido!`);
   };
 
-  const handleSimularCelebracao = () => {
-    setSacristiaState((prev) => {
-      const novoseConsumiveis = prev.consumiveis.map((c) => {
+  const handleSimularCelebracao = async () => {
+    // Se consumíveis não estiver na memória, carrega primeiro
+    if (!loadedCategoriesData.consumiveis) {
+      await loadCategoryData('consumiveis');
+    }
+
+    setLoadedCategoriesData((prev) => {
+      const novoseConsumiveis = (prev.consumiveis || []).map((c) => {
         if (c.tipo === 'hostias') {
           return {
             ...c,
@@ -119,57 +243,74 @@ export default function SacristiaDashboardPage() {
         return c;
       });
 
-      return {
-        ...prev,
-        consumiveis: novoseConsumiveis,
-      };
+      saveCategoryToLocalStorage({ consumiveis: novoseConsumiveis });
+      return { ...prev, consumiveis: novoseConsumiveis };
     });
     triggerToast('⚡ Consumo de 1 Missa Solene registrado! (Hóstias, Vinho, Incenso e Carvão atualizados)');
   };
 
   const handleUpdateToalha = (updatedItem: any) => {
-    setSacristiaState((prev) => ({
-      ...prev,
-      toalhas: prev.toalhas.map((t) => (t.id === updatedItem.id ? updatedItem : t)),
-    }));
+    setLoadedCategoriesData((prev) => {
+      const newToalhas = (prev.toalhas || []).map((t) =>
+        t.id === updatedItem.id ? updatedItem : t
+      );
+      saveCategoryToLocalStorage({ toalhas: newToalhas });
+      return { ...prev, toalhas: newToalhas };
+    });
     triggerToast(`Item "${updatedItem.nome}" atualizado.`);
   };
 
   const handleUpdateParamento = (updatedItem: any) => {
-    setSacristiaState((prev) => ({
-      ...prev,
-      paramentos: prev.paramentos.map((p) => (p.id === updatedItem.id ? updatedItem : p)),
-    }));
+    setLoadedCategoriesData((prev) => {
+      const newParamentos = (prev.paramentos || []).map((p) =>
+        p.id === updatedItem.id ? updatedItem : p
+      );
+      saveCategoryToLocalStorage({ paramentos: newParamentos });
+      return { ...prev, paramentos: newParamentos };
+    });
     triggerToast(`Paramento "${updatedItem.nome}" atualizado.`);
   };
 
   const handleUpdateVaso = (updatedItem: any) => {
-    setSacristiaState((prev) => ({
-      ...prev,
-      vasos: prev.vasos.map((v) => (v.id === updatedItem.id ? updatedItem : v)),
-    }));
+    setLoadedCategoriesData((prev) => {
+      const newVasos = (prev.vasos || []).map((v) =>
+        v.id === updatedItem.id ? updatedItem : v
+      );
+      saveCategoryToLocalStorage({ vasos: newVasos });
+      return { ...prev, vasos: newVasos };
+    });
     triggerToast(`Vaso Sagrado "${updatedItem.nome}" atualizado.`);
   };
 
   const handleUpdateDecoracao = (updatedItem: any) => {
-    setSacristiaState((prev) => ({
-      ...prev,
-      decoracoes: prev.decoracoes.map((d) => (d.id === updatedItem.id ? updatedItem : d)),
-    }));
+    setLoadedCategoriesData((prev) => {
+      const newDecoracoes = (prev.decoracoes || []).map((d) =>
+        d.id === updatedItem.id ? updatedItem : d
+      );
+      saveCategoryToLocalStorage({ decoracoes: newDecoracoes });
+      return { ...prev, decoracoes: newDecoracoes };
+    });
     triggerToast(`Objeto "${updatedItem.nome}" atualizado.`);
   };
 
   const handleAddInventoryItem = (category: string, newItem: any) => {
-    setSacristiaState((prev: any) => ({
-      ...prev,
-      [category]: [newItem, ...prev[category]],
-    }));
+    setLoadedCategoriesData((prev: any) => {
+      const currentList = prev[category] || [];
+      const newList = [newItem, ...currentList];
+      saveCategoryToLocalStorage({ [category]: newList });
+      return { ...prev, [category]: newList };
+    });
     triggerToast(`Novo item "${newItem.nome}" adicionado ao inventário!`);
   };
 
   const handleResetState = () => {
-    if (confirm('Deseja restaurar os dados originais da Sacristia? Todas as alterações locais serão redefinidas.')) {
-      setSacristiaState(INITIAL_SACRISTIA_DATA);
+    if (
+      confirm(
+        'Deseja restaurar os dados originais da Sacristia? Todas as alterações locais serão redefinidas.'
+      )
+    ) {
+      setLoadedCategoriesData({});
+      setActiveCategory(null);
       try {
         localStorage.removeItem(LOCAL_STORAGE_KEY);
       } catch (e) {}
@@ -229,63 +370,95 @@ export default function SacristiaDashboardPage() {
           </div>
         </section>
 
-        {/* 1. COMPACT OPERATIONAL INDICATORS SUMMARY */}
+        {/* 1. COMPACT OPERATIONAL INDICATORS SUMMARY (TELA INICIAL) */}
         <SacristiaSummary
-          state={sacristiaState}
+          state={loadedCategoriesData}
           onFilterClick={(filterType) => {
-            if (filterType === 'lavagem') setActiveCategory('alfaias');
-            else if (filterType === 'alertas') setActiveCategory('consumiveis');
-            else setActiveCategory('todas');
+            if (filterType === 'lavagem') loadCategoryData('alfaias');
+            else if (filterType === 'alertas') loadCategoryData('consumiveis');
+            else loadCategoryData('todas');
           }}
         />
 
-        {/* 2. ALERTA "⚠ ATENÇÃO NA SACRISTIA" */}
+        {/* 2. ALERTA "⚠ ATENÇÃO NA SACRISTIA" (TELA INICIAL) */}
         <SacristiaAlerts
-          state={sacristiaState}
-          onNavigateToCategory={(category) => setActiveCategory(category as any)}
+          state={loadedCategoriesData}
+          onNavigateToCategory={(category) => loadCategoryData(category as SacristiaCategoria)}
         />
 
-        {/* 3. GRID RESPONSIVO DAS CATEGORIAS DA SACRISTIA */}
+        {/* 3. GRID RESPONSIVO DAS CATEGORIAS DA SACRISTIA (TELA INICIAL) */}
         <CategoriesGrid
-          state={sacristiaState}
+          state={loadedCategoriesData}
           activeCategory={activeCategory}
-          onSelectCategory={(cat) => setActiveCategory(cat)}
+          onSelectCategory={(cat) => loadCategoryData(cat)}
         />
 
-        {/* 4. MÓDULOS DE GERENCIAMENTO INTERATIVOS */}
-        <div className="space-y-8 pt-2">
+        {/* 4. MÓDULOS DE GERENCIAMENTO INTERATIVOS (CARREGADOS SOMENTE SOB DEMANDA) */}
+        <div ref={moduleRef} className="space-y-8 pt-2 scroll-mt-6">
           
+          {/* SKELETON LOADER DURANTE O DOWNLOAD ASSÍNCRONO */}
+          {loadingCategory && <ModuleSkeleton />}
+
+          {/* PAINEL DE NAVEGAÇÃO E BOTÃO "VOLTAR PARA CATEGORIAS" QUANDO UMA CATEGORIA ESTÁ ATIVA */}
+          {activeCategory && !loadingCategory && (
+            <div className="flex items-center justify-between bg-[#FFFCF6] border border-[#E5D8BE] px-4 sm:px-5 py-3 rounded-2xl shadow-xs">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#DDBB70] animate-ping" />
+                <span className="text-xs font-bold font-serif text-[#17243A] uppercase tracking-wider">
+                  Módulo Ativo: {activeCategory === 'todas' ? 'Todas as Categorias' : activeCategory}
+                </span>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setActiveCategory(null)}
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-[#17243A] text-[#DDBB70] hover:bg-[#223451] transition-all cursor-pointer shadow-2xs"
+              >
+                <ArrowLeft className="w-3.5 h-3.5 text-[#DDBB70]" />
+                <span>Voltar para Categorias</span>
+              </button>
+            </div>
+          )}
+
           {/* MÓDULO EXCLUSIVO 1: ALFAIAS LITÚRGICAS (3 ÁGUAS) */}
-          {(activeCategory === 'todas' || activeCategory === 'alfaias') && (
+          {!loadingCategory && (activeCategory === 'todas' || activeCategory === 'alfaias') && (
             <AlfaiasManager
-              alfaias={sacristiaState.alfaias}
+              alfaias={loadedCategoriesData.alfaias || []}
               onUpdateAlfaia={handleUpdateAlfaia}
               onAddAlfaia={handleAddAlfaia}
             />
           )}
 
           {/* MÓDULO EXCLUSIVO 2: MATERIAIS DE CONSUMO (CÁLCULO DINÂMICO) */}
-          {(activeCategory === 'todas' || activeCategory === 'consumiveis') && (
+          {!loadingCategory && (activeCategory === 'todas' || activeCategory === 'consumiveis') && (
             <ConsumablesCard
-              consumiveis={sacristiaState.consumiveis}
+              consumiveis={loadedCategoriesData.consumiveis || []}
               onUpdateConsumivel={handleUpdateConsumivel}
               onSimularCelebracao={handleSimularCelebracao}
             />
           )}
 
           {/* MÓDULO EXCLUSIVO 3: INVENTÁRIO GERAL (TOALHAS, PARAMENTOS, VASOS, DECORAÇÃO) */}
-          {(activeCategory === 'todas' ||
-            ['toalhas', 'paramentos', 'vasos', 'decoracao'].includes(activeCategory)) && (
-            <InventoryCard
-              state={sacristiaState}
-              activeCategoryFilter={activeCategory}
-              onUpdateToalha={handleUpdateToalha}
-              onUpdateParamento={handleUpdateParamento}
-              onUpdateVaso={handleUpdateVaso}
-              onUpdateDecoracao={handleUpdateDecoracao}
-              onAddItem={handleAddInventoryItem}
-            />
-          )}
+          {!loadingCategory &&
+            (activeCategory === 'todas' ||
+              (activeCategory && ['toalhas', 'paramentos', 'vasos', 'decoracao'].includes(activeCategory))) && (
+              <InventoryCard
+                state={{
+                  alfaias: loadedCategoriesData.alfaias || [],
+                  toalhas: loadedCategoriesData.toalhas || [],
+                  paramentos: loadedCategoriesData.paramentos || [],
+                  vasos: loadedCategoriesData.vasos || [],
+                  consumiveis: loadedCategoriesData.consumiveis || [],
+                  decoracoes: loadedCategoriesData.decoracoes || [],
+                }}
+                activeCategoryFilter={activeCategory === 'todas' ? 'todos' : activeCategory}
+                onUpdateToalha={handleUpdateToalha}
+                onUpdateParamento={handleUpdateParamento}
+                onUpdateVaso={handleUpdateVaso}
+                onUpdateDecoracao={handleUpdateDecoracao}
+                onAddItem={handleAddInventoryItem}
+              />
+            )}
 
         </div>
 

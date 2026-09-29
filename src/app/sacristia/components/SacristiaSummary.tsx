@@ -2,49 +2,57 @@
 
 import React from 'react';
 import { SacristiaState } from '@/types/sacristia';
+import { SUMMARY_DATA } from '../data/summaryData';
 import { Layers, CheckCircle2, Droplets, AlertTriangle, Wrench } from 'lucide-react';
 
 interface SacristiaSummaryProps {
-  state: SacristiaState;
+  state?: Partial<SacristiaState>;
   onFilterClick?: (filterType: string) => void;
 }
 
 export const SacristiaSummary: React.FC<SacristiaSummaryProps> = ({ state, onFilterClick }) => {
-  // Calculations
-  const totalAlfaias = state.alfaias.length;
-  const totalToalhas = state.toalhas.length;
-  const totalParamentos = state.paramentos.length;
-  const totalVasos = state.vasos.length;
-  const totalConsumiveis = state.consumiveis.length;
-  const totalDecoracao = state.decoracoes.length;
+  // Calculations with optional chaining and fallback to SUMMARY_DATA
+  const alfaias = state?.alfaias;
+  const toalhas = state?.toalhas;
+  const paramentos = state?.paramentos;
+  const vasos = state?.vasos;
+  const consumiveis = state?.consumiveis;
+  const decoracoes = state?.decoracoes;
+
+  const totalAlfaias = alfaias ? alfaias.length : SUMMARY_DATA.totalAlfaias;
+  const totalToalhas = toalhas ? toalhas.length : SUMMARY_DATA.totalToalhas;
+  const totalParamentos = paramentos ? paramentos.length : SUMMARY_DATA.totalParamentos;
+  const totalVasos = vasos ? vasos.length : SUMMARY_DATA.totalVasos;
+  const totalConsumiveis = consumiveis ? consumiveis.length : SUMMARY_DATA.totalConsumiveis;
+  const totalDecoracao = decoracoes ? decoracoes.length : SUMMARY_DATA.totalDecoracao;
 
   const totalGeral = totalAlfaias + totalToalhas + totalParamentos + totalVasos + totalConsumiveis + totalDecoracao;
 
   // Em uso
-  const alfaiasEmUso = state.alfaias.filter(a => a.etapaLavagem === 'uso').length;
-  const toalhasEmUso = state.toalhas.filter(t => t.status === 'em_uso').length;
-  const paramentosEmUso = state.paramentos.filter(p => p.status === 'em_uso').length;
-  const vasosEmUso = state.vasos.filter(v => v.status === 'em_uso').length;
-  const decoracaoEmUso = state.decoracoes.filter(d => d.status === 'em_uso').length;
+  const alfaiasEmUso = alfaias ? alfaias.filter(a => a.etapaLavagem === 'uso').length : 1;
+  const toalhasEmUso = toalhas ? toalhas.filter(t => t.status === 'em_uso').length : SUMMARY_DATA.toalhasEmUsoCount;
+  const paramentosEmUso = paramentos ? paramentos.filter(p => p.status === 'em_uso').length : 3;
+  const vasosEmUso = vasos ? vasos.filter(v => v.status === 'em_uso').length : SUMMARY_DATA.vasosEmUsoCount;
+  const decoracaoEmUso = decoracoes ? decoracoes.filter(d => d.status === 'em_uso').length : SUMMARY_DATA.decoracaoEmUsoCount;
   const emUsoTotal = alfaiasEmUso + toalhasEmUso + paramentosEmUso + vasosEmUso + decoracaoEmUso;
 
   // Em lavagem / 3 Águas
-  const alfaiasEmLavagem = state.alfaias.filter(a => ['agua1', 'agua2', 'agua3', 'passar'].includes(a.etapaLavagem)).length;
-  const toalhasEmLavagem = state.toalhas.filter(t => ['aguardando_lavagem', 'passar'].includes(t.status)).length;
-  const paramentosEmLavagem = state.paramentos.filter(p => p.status === 'lavanderia').length;
-  const vasosEmHigienizacao = state.vasos.filter(v => v.status === 'higienizacao').length;
+  const alfaiasEmLavagem = alfaias ? alfaias.filter(a => ['agua1', 'agua2', 'agua3', 'passar'].includes(a.etapaLavagem)).length : SUMMARY_DATA.alfaiasEmLavagemCount;
+  const toalhasEmLavagem = toalhas ? toalhas.filter(t => ['aguardando_lavagem', 'passar'].includes(t.status)).length : 2;
+  const paramentosEmLavagem = paramentos ? paramentos.filter(p => p.status === 'lavanderia').length : 0;
+  const vasosEmHigienizacao = vasos ? vasos.filter(v => v.status === 'higienizacao').length : 0;
   const emLavagemTotal = alfaiasEmLavagem + toalhasEmLavagem + paramentosEmLavagem + vasosEmHigienizacao;
 
   // Em Manutenção
-  const toalhasManutencao = state.toalhas.filter(t => t.status === 'em_manutencao').length;
-  const paramentosManutencao = state.paramentos.filter(p => p.status === 'em_manutencao').length;
-  const vasosManutencao = state.vasos.filter(v => v.status === 'em_manutencao').length;
-  const decoracaoManutencao = state.decoracoes.filter(d => d.status === 'em_manutencao').length;
+  const toalhasManutencao = toalhas ? toalhas.filter(t => t.status === 'em_manutencao').length : 0;
+  const paramentosManutencao = paramentos ? paramentos.filter(p => p.status === 'em_manutencao').length : 0;
+  const vasosManutencao = vasos ? vasos.filter(v => v.status === 'em_manutencao').length : 0;
+  const decoracaoManutencao = decoracoes ? decoracoes.filter(d => d.status === 'em_manutencao').length : 0;
   const emManutencaoTotal = toalhasManutencao + paramentosManutencao + vasosManutencao + decoracaoManutencao;
 
   // Alertas (Consumíveis abaixo do nível mínimo ou Alfaias aguardando 3ª água)
-  const consumiveisAlerta = state.consumiveis.filter(c => c.quantidadeAtual <= c.alertaMinimo).length;
-  const alfaiasUrgentes3Agua = state.alfaias.filter(a => a.etapaLavagem === 'agua3').length;
+  const consumiveisAlerta = consumiveis ? consumiveis.filter(c => c.quantidadeAtual <= c.alertaMinimo).length : 2;
+  const alfaiasUrgentes3Agua = alfaias ? alfaias.filter(a => a.etapaLavagem === 'agua3').length : 1;
   const alertasTotal = consumiveisAlerta + alfaiasUrgentes3Agua;
 
   return (

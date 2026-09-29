@@ -1,88 +1,109 @@
 'use client';
 
 import React from 'react';
-import { SacristiaState } from '@/types/sacristia';
+import { SacristiaState, SacristiaCategoria } from '@/types/sacristia';
+import { INITIAL_ALERTS } from '../data/summaryData';
 import { AlertCircle, ArrowRight, Droplets, Package, RefreshCw } from 'lucide-react';
 
 interface SacristiaAlertsProps {
-  state: SacristiaState;
-  onNavigateToCategory?: (category: string) => void;
+  state?: Partial<SacristiaState>;
+  onNavigateToCategory?: (category: SacristiaCategoria) => void;
 }
 
 export const SacristiaAlerts: React.FC<SacristiaAlertsProps> = ({ state, onNavigateToCategory }) => {
+  const hasLoadedAnyCategory = Boolean(
+    state?.consumiveis || state?.alfaias || state?.toalhas || state?.paramentos || state?.vasos || state?.decoracoes
+  );
+
   // Collect active alerts
   const alerts: Array<{
     id: string;
     title: string;
     description: string;
     severity: 'warning' | 'info' | 'critical';
-    category: string;
+    category: SacristiaCategoria;
     icon: React.ReactNode;
   }> = [];
 
-  // Check consumables below minimum alert threshold
-  state.consumiveis.forEach((c) => {
-    if (c.quantidadeAtual <= c.alertaMinimo) {
-      if (c.tipo === 'hostias') {
-        const diasRestantes = c.taxaConsumoPorDia
-          ? (c.quantidadeAtual / c.taxaConsumoPorDia).toFixed(1)
-          : 'poucos';
-        alerts.push({
-          id: `alert-${c.id}`,
-          title: `Estoque de Hóstias / Partículas em atenção`,
-          description: `Restam ${c.quantidadeAtual.toLocaleString()} unidades (estimativa para ~${diasRestantes} dias). Providencie novo lote com o fornecedor.`,
-          severity: 'critical',
-          category: 'consumiveis',
-          icon: <Package className="w-4 h-4 text-[#D97706]" />,
-        });
-      } else if (c.tipo === 'vinho') {
-        const celebs = Math.floor(c.quantidadeAtual / c.taxaConsumoPorCelebracao);
-        alerts.push({
-          id: `alert-${c.id}`,
-          title: `Vinho Canônico Litúrgico abaixo do estoque recomendado`,
-          description: `Restam apenas ${c.quantidadeAtual} garrafas (suficiente para ~${celebs} celebrações). Reabasteça para o próximo fim de semana.`,
-          severity: 'warning',
-          category: 'consumiveis',
-          icon: <Package className="w-4 h-4 text-[#D97706]" />,
-        });
-      } else {
-        alerts.push({
-          id: `alert-${c.id}`,
-          title: `Aviso de Estoque: ${c.nome}`,
-          description: `Restam ${c.quantidadeAtual} ${c.unidadeMedida} (mínimo recomendado: ${c.alertaMinimo}).`,
-          severity: 'info',
-          category: 'consumiveis',
-          icon: <Package className="w-4 h-4 text-[#3B82F6]" />,
-        });
+  if (hasLoadedAnyCategory) {
+    // Check consumables below minimum alert threshold
+    state?.consumiveis?.forEach((c) => {
+      if (c.quantidadeAtual <= c.alertaMinimo) {
+        if (c.tipo === 'hostias') {
+          const diasRestantes = c.taxaConsumoPorDia
+            ? (c.quantidadeAtual / c.taxaConsumoPorDia).toFixed(1)
+            : 'poucos';
+          alerts.push({
+            id: `alert-${c.id}`,
+            title: `Estoque de Hóstias / Partículas em atenção`,
+            description: `Restam ${c.quantidadeAtual.toLocaleString()} unidades (estimativa para ~${diasRestantes} dias). Providencie novo lote com o fornecedor.`,
+            severity: 'critical',
+            category: 'consumiveis',
+            icon: <Package className="w-4 h-4 text-[#D97706]" />,
+          });
+        } else if (c.tipo === 'vinho') {
+          const celebs = Math.floor(c.quantidadeAtual / c.taxaConsumoPorCelebracao);
+          alerts.push({
+            id: `alert-${c.id}`,
+            title: `Vinho Canônico Litúrgico abaixo do estoque recomendado`,
+            description: `Restam apenas ${c.quantidadeAtual} garrafas (suficiente para ~${celebs} celebrações). Reabasteça para o próximo fim de semana.`,
+            severity: 'warning',
+            category: 'consumiveis',
+            icon: <Package className="w-4 h-4 text-[#D97706]" />,
+          });
+        } else {
+          alerts.push({
+            id: `alert-${c.id}`,
+            title: `Aviso de Estoque: ${c.nome}`,
+            description: `Restam ${c.quantidadeAtual} ${c.unidadeMedida} (mínimo recomendado: ${c.alertaMinimo}).`,
+            severity: 'info',
+            category: 'consumiveis',
+            icon: <Package className="w-4 h-4 text-[#3B82F6]" />,
+          });
+        }
       }
-    }
-  });
-
-  // Check Alfaias waiting for 3rd water or ironing
-  const alfaias3Agua = state.alfaias.filter((a) => a.etapaLavagem === 'agua3');
-  alfaias3Agua.forEach((a) => {
-    alerts.push({
-      id: `alert-alf-${a.id}`,
-      title: `Purificação Ritual: ${a.nome}`,
-      description: `Aguardando a 3ª imersão de purificação ritual em água limpa antes de ir para a lavagem/passagem.`,
-      severity: 'info',
-      category: 'alfaias',
-      icon: <Droplets className="w-4 h-4 text-[#2563EB]" />,
     });
-  });
 
-  // Check Toalhas waiting for washing
-  const toalhasLavagem = state.toalhas.filter((t) => t.status === 'aguardando_lavagem');
-  toalhasLavagem.forEach((t) => {
-    alerts.push({
-      id: `alert-toa-${t.id}`,
-      title: `Lavagem Pendente: ${t.nome}`,
-      description: `Item aguardando higienização para retornar ao presbitério.`,
-      severity: 'info',
-      category: 'toalhas',
-      icon: <RefreshCw className="w-4 h-4 text-[#7C3AED]" />,
+    // Check Alfaias waiting for 3rd water or ironing
+    state?.alfaias
+      ?.filter((a) => a.etapaLavagem === 'agua3')
+      .forEach((a) => {
+        alerts.push({
+          id: `alert-alf-${a.id}`,
+          title: `Purificação Ritual: ${a.nome}`,
+          description: `Aguardando a 3ª imersão de purificação ritual em água limpa antes de ir para a lavagem/passagem.`,
+          severity: 'info',
+          category: 'alfaias',
+          icon: <Droplets className="w-4 h-4 text-[#2563EB]" />,
+        });
+      });
+
+    // Check Toalhas waiting for washing
+    state?.toalhas
+      ?.filter((t) => t.status === 'aguardando_lavagem')
+      .forEach((t) => {
+        alerts.push({
+          id: `alert-toa-${t.id}`,
+          title: `Lavagem Pendente: ${t.nome}`,
+          description: `Item aguardando higienização para retornar ao presbitério.`,
+          severity: 'info',
+          category: 'toalhas',
+          icon: <RefreshCw className="w-4 h-4 text-[#7C3AED]" />,
+        });
+      });
+  } else {
+    // Before categories are loaded into memory, present initial alerts from summaryData
+    INITIAL_ALERTS.forEach((ia) => {
+      let icon = <Package className="w-4 h-4 text-[#D97706]" />;
+      if (ia.category === 'alfaias') icon = <Droplets className="w-4 h-4 text-[#2563EB]" />;
+      if (ia.category === 'toalhas') icon = <RefreshCw className="w-4 h-4 text-[#7C3AED]" />;
+
+      alerts.push({
+        ...ia,
+        icon,
+      });
     });
-  });
+  }
 
   if (alerts.length === 0) {
     return (

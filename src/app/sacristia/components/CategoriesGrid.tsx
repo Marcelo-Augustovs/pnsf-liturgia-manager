@@ -2,11 +2,12 @@
 
 import React from 'react';
 import { SacristiaState, SacristiaCategoria } from '@/types/sacristia';
+import { SUMMARY_DATA } from '../data/summaryData';
 import { Droplets, Layers, Shield, Sparkles, Package, Image as ImageIcon, ArrowRight } from 'lucide-react';
 
 interface CategoriesGridProps {
-  state: SacristiaState;
-  activeCategory: SacristiaCategoria | 'todas';
+  state?: Partial<SacristiaState>;
+  activeCategory: SacristiaCategoria | 'todas' | null;
   onSelectCategory: (cat: SacristiaCategoria | 'todas') => void;
 }
 
@@ -15,6 +16,26 @@ export const CategoriesGrid: React.FC<CategoriesGridProps> = ({
   activeCategory,
   onSelectCategory,
 }) => {
+  const countAlfaias = state?.alfaias ? state.alfaias.length : SUMMARY_DATA.totalAlfaias;
+  const countToalhas = state?.toalhas ? state.toalhas.length : SUMMARY_DATA.totalToalhas;
+  const countParamentos = state?.paramentos ? state.paramentos.length : SUMMARY_DATA.totalParamentos;
+  const countVasos = state?.vasos ? state.vasos.length : SUMMARY_DATA.totalVasos;
+  const countConsumiveis = state?.consumiveis ? state.consumiveis.length : SUMMARY_DATA.totalConsumiveis;
+  const countDecoracao = state?.decoracoes ? state.decoracoes.length : SUMMARY_DATA.totalDecoracao;
+
+  const detalhesAlfaias = state?.alfaias
+    ? `${state.alfaias.filter(a => ['agua1', 'agua2', 'agua3', 'passar'].includes(a.etapaLavagem)).length} em fluxo de purificação`
+    : `${SUMMARY_DATA.alfaiasEmLavagemCount} em fluxo de purificação`;
+  const detalhesToalhas = state?.toalhas
+    ? `${state.toalhas.filter(t => t.status === 'em_uso').length} em uso no altar`
+    : `${SUMMARY_DATA.toalhasEmUsoCount} em uso no altar`;
+  const detalhesVasos = state?.vasos
+    ? `${state.vasos.filter(v => v.status === 'em_uso').length} no altar/sacrário`
+    : `${SUMMARY_DATA.vasosEmUsoCount} no altar/sacrário`;
+  const detalhesDecoracao = state?.decoracoes
+    ? `${state.decoracoes.filter(d => d.status === 'em_uso').length} dispostos na Igreja`
+    : `${SUMMARY_DATA.decoracaoEmUsoCount} dispostos na Igreja`;
+
   const categories: Array<{
     id: SacristiaCategoria;
     nome: string;
@@ -29,8 +50,8 @@ export const CategoriesGrid: React.FC<CategoriesGridProps> = ({
       nome: '1. Alfaias Litúrgicas',
       subtitulo: 'Sanguíneo, Corporal, Pala e Manustérgio',
       icon: <Droplets className="w-5 h-5 text-[#2563EB]" />,
-      count: state.alfaias.length,
-      detalhes: `${state.alfaias.filter(a => ['agua1', 'agua2', 'agua3', 'passar'].includes(a.etapaLavagem)).length} em fluxo de purificação`,
+      count: countAlfaias,
+      detalhes: detalhesAlfaias,
       badgeRegra: '❖ Fluxo Rigoroso de 3 Águas',
     },
     {
@@ -38,15 +59,15 @@ export const CategoriesGrid: React.FC<CategoriesGridProps> = ({
       nome: '2. Toalhas e Têxteis do Altar',
       subtitulo: 'Toalhas de Altar, Santíssimo, Comunhão e Conopéu',
       icon: <Layers className="w-5 h-5 text-[#7C3AED]" />,
-      count: state.toalhas.length,
-      detalhes: `${state.toalhas.filter(t => t.status === 'em_uso').length} em uso no altar`,
+      count: countToalhas,
+      detalhes: detalhesToalhas,
     },
     {
       id: 'paramentos',
       nome: '3. Véus e Casulas / Paramentos',
       subtitulo: 'Casulas, Véus de Cálice, Alvas, Estolas, Capas',
       icon: <Shield className="w-5 h-5 text-[#D97706]" />,
-      count: state.paramentos.length,
+      count: countParamentos,
       detalhes: `Cores Litúrgicas: Roxo, Branco, Verde, Rosa...`,
     },
     {
@@ -54,15 +75,15 @@ export const CategoriesGrid: React.FC<CategoriesGridProps> = ({
       nome: '4. Vasos Sagrados',
       subtitulo: 'Cálices, Patenas, Âmbulas, Galhetas, Custódia, Teca',
       icon: <Sparkles className="w-5 h-5 text-[#B58A2A]" />,
-      count: state.vasos.length,
-      detalhes: `${state.vasos.filter(v => v.status === 'em_uso').length} no altar/sacrário`,
+      count: countVasos,
+      detalhes: detalhesVasos,
     },
     {
       id: 'consumiveis',
       nome: '5. Materiais de Consumo',
       subtitulo: 'Hóstias, Vinho Canônico, Incenso e Carvão',
       icon: <Package className="w-5 h-5 text-[#059669]" />,
-      count: state.consumiveis.length,
+      count: countConsumiveis,
       detalhes: `Cálculo automático de autonomia e celebrações`,
     },
     {
@@ -70,8 +91,8 @@ export const CategoriesGrid: React.FC<CategoriesGridProps> = ({
       nome: '6. Sacristia & Objetos',
       subtitulo: 'Tapetes, Suportes, Banquinhos, Quadros e Imagens',
       icon: <ImageIcon className="w-5 h-5 text-[#4B5563]" />,
-      count: state.decoracoes.length,
-      detalhes: `${state.decoracoes.filter(d => d.status === 'em_uso').length} dispostos na Igreja`,
+      count: countDecoracao,
+      detalhes: detalhesDecoracao,
     },
   ];
 
