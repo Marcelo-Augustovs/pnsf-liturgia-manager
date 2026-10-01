@@ -11,6 +11,7 @@ import {
   ItemInventario,
   ModuloSacristia,
 } from '@/types/sacristia';
+import { DetalhesItemModal } from './DetalhesItemModal';
 import {
   Layers,
   Sparkles,
@@ -19,12 +20,14 @@ import {
   Search,
   Plus,
   X,
-  Edit,
+  Eye,
   MapPin,
   Clock,
   Package,
   ChevronRight,
 } from 'lucide-react';
+
+type StatusGeral = 'em_uso' | 'guardado' | 'lavagem' | 'manutencao';
 
 // ─── Definição canônica dos módulos (futura fonte: GET /modulos) ──────────────
 const MODULOS: ModuloSacristia[] = [
@@ -115,6 +118,8 @@ export const InventoryCard: React.FC<InventoryCardProps> = ({
   const [subcategoriaSelecionada, setSubcategoriaSelecionada] = useState<string>('todos');
   const [statusSelecionado, setStatusSelecionado] = useState<string>('todos');
   const [termoBusca, setTermoBusca] = useState<string>('');
+  // ─── Modal de detalhes ──────────────────────────────────────────────────────
+  const [itemSelecionado, setItemSelecionado] = useState<ItemInventario | null>(null);
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
 
   // Form modal
@@ -155,6 +160,7 @@ export const InventoryCard: React.FC<InventoryCardProps> = ({
 
     // Toalhas
     state.toalhas.forEach(t => {
+      const orig = t as any;
       items.push({
         id: t.id,
         codigo: t.codigo,
@@ -178,11 +184,18 @@ export const InventoryCard: React.FC<InventoryCardProps> = ({
         observacao: t.observacao,
         ultimaAtualizacao: t.ultimaAtualizacao,
         originalData: t,
+        descricao: orig.descricao,
+        historia: orig.historia,
+        simbolismoLiturgico: orig.simbolismoLiturgico,
+        codigoPatrimonial: orig.codigoPatrimonial,
+        dataAquisicao: orig.dataAquisicao,
+        responsavel: orig.responsavel,
       });
     });
 
     // Paramentos
     state.paramentos.forEach(p => {
+      const orig = p as any;
       items.push({
         id: p.id,
         codigo: p.codigo,
@@ -205,11 +218,18 @@ export const InventoryCard: React.FC<InventoryCardProps> = ({
         observacao: p.observacao,
         ultimaAtualizacao: p.ultimaAtualizacao,
         originalData: p,
+        descricao: orig.descricao,
+        historia: orig.historia,
+        simbolismoLiturgico: orig.simbolismoLiturgico,
+        codigoPatrimonial: orig.codigoPatrimonial,
+        dataAquisicao: orig.dataAquisicao,
+        responsavel: orig.responsavel,
       });
     });
 
     // Vasos Sagrados
     state.vasos.forEach(v => {
+      const orig = v as any;
       items.push({
         id: v.id,
         codigo: v.codigo,
@@ -229,14 +249,23 @@ export const InventoryCard: React.FC<InventoryCardProps> = ({
         localizacao: v.localizacao,
         imagem: v.imagem,
         detalhesExtra: `Material: ${v.material}`,
+        material: v.material,
         observacao: v.observacao,
         ultimaAtualizacao: v.ultimaAtualizacao,
         originalData: v,
+        // campos opcionais ricos
+        descricao: orig.descricao,
+        historia: orig.historia,
+        simbolismoLiturgico: orig.simbolismoLiturgico,
+        codigoPatrimonial: orig.codigoPatrimonial,
+        dataAquisicao: orig.dataAquisicao,
+        responsavel: orig.responsavel,
       });
     });
 
     // Decoração & Objetos
     state.decoracoes.forEach(d => {
+      const orig = d as any;
       items.push({
         id: d.id,
         codigo: d.codigo,
@@ -256,6 +285,12 @@ export const InventoryCard: React.FC<InventoryCardProps> = ({
         observacao: d.observacao,
         ultimaAtualizacao: d.ultimaAtualizacao,
         originalData: d,
+        descricao: orig.descricao,
+        historia: orig.historia,
+        simbolismoLiturgico: orig.simbolismoLiturgico,
+        codigoPatrimonial: orig.codigoPatrimonial,
+        dataAquisicao: orig.dataAquisicao,
+        responsavel: orig.responsavel,
       });
     });
 
@@ -330,7 +365,7 @@ export const InventoryCard: React.FC<InventoryCardProps> = ({
     );
   }
 
-  // ─── Alternar status ─────────────────────────────────────────────────────────
+  // ─── Alternar status (toggle rápido — mantido para compatibilidade) ──────────
   function handleToggleStatus(item: ItemInventario) {
     const now = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
     if (item.moduloId === 'toalhas') {
@@ -346,6 +381,38 @@ export const InventoryCard: React.FC<InventoryCardProps> = ({
     } else if (item.moduloId === 'decoracao') {
       const orig = item.originalData as ItemDecoracao;
       onUpdateDecoracao({ ...orig, status: orig.status === 'em_uso' ? 'guardado' : 'em_uso', ultimaAtualizacao: `Hoje, ${now}` });
+    }
+  }
+
+  // ─── Salvar novo status vindo do modal ───────────────────────────────────────
+  function handleSaveStatus(item: ItemInventario, novoStatus: StatusGeral) {
+    const now = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    const atualizado = `Hoje, ${now}`;
+
+    if (item.moduloId === 'toalhas') {
+      const orig = item.originalData as ItemToalha;
+      const statusMap: Record<StatusGeral, ItemToalha['status']> = {
+        em_uso: 'em_uso', guardado: 'guardada', lavagem: 'aguardando_lavagem', manutencao: 'em_manutencao',
+      };
+      onUpdateToalha({ ...orig, status: statusMap[novoStatus], ultimaAtualizacao: atualizado });
+    } else if (item.moduloId === 'paramentos') {
+      const orig = item.originalData as ItemParamento;
+      const statusMap: Record<StatusGeral, ItemParamento['status']> = {
+        em_uso: 'em_uso', guardado: 'guardado', lavagem: 'lavanderia', manutencao: 'em_manutencao',
+      };
+      onUpdateParamento({ ...orig, status: statusMap[novoStatus], ultimaAtualizacao: atualizado });
+    } else if (item.moduloId === 'vasos') {
+      const orig = item.originalData as ItemVasoSagrado;
+      const statusMap: Record<StatusGeral, ItemVasoSagrado['status']> = {
+        em_uso: 'em_uso', guardado: 'guardado', lavagem: 'higienizacao', manutencao: 'em_manutencao',
+      };
+      onUpdateVaso({ ...orig, status: statusMap[novoStatus], ultimaAtualizacao: atualizado });
+    } else if (item.moduloId === 'decoracao') {
+      const orig = item.originalData as ItemDecoracao;
+      const statusMap: Record<StatusGeral, ItemDecoracao['status']> = {
+        em_uso: 'em_uso', guardado: 'guardado', lavagem: 'guardado', manutencao: 'em_manutencao',
+      };
+      onUpdateDecoracao({ ...orig, status: statusMap[novoStatus], ultimaAtualizacao: atualizado });
     }
   }
 
@@ -592,11 +659,11 @@ export const InventoryCard: React.FC<InventoryCardProps> = ({
                   <div className="flex items-center gap-1">
                     <button
                       type="button"
-                      onClick={() => handleToggleStatus(item)}
+                      onClick={() => setItemSelecionado(item)}
                       className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-[#F5EFE6] hover:bg-[#EEDBB5] text-[#17243A] text-[10px] font-semibold border border-[#E5D8BE] transition-all cursor-pointer"
-                      title="Alternar Status"
+                      title="Ver detalhes deste item"
                     >
-                      <Edit className="w-3 h-3 text-[#9A6F20]" />
+                      <Eye className="w-3 h-3 text-[#9A6F20]" />
                       <span>Ver detalhes</span>
                       <ChevronRight className="w-2.5 h-2.5 text-[#9A6F20]" />
                     </button>
@@ -627,6 +694,13 @@ export const InventoryCard: React.FC<InventoryCardProps> = ({
           </div>
         </div>
       )}
+
+      {/* ── MODAL DE DETALHES DO ITEM ── */}
+      <DetalhesItemModal
+        item={itemSelecionado}
+        onClose={() => setItemSelecionado(null)}
+        onSaveStatus={handleSaveStatus}
+      />
 
       {/* ── MODAL CADASTRAR ITEM ── */}
       {showAddModal && (
