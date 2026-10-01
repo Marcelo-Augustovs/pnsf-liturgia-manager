@@ -123,5 +123,18 @@ export interface ItemInventario {
   observacao?: string;
   ultimaAtualizacao: string;
   originalData: any;
+
+  // ── Campos opcionais para o modal de detalhes ─────────────────────────────
+  // Aba "Descrição"
+  descricao?: string;
+  // Aba "História" (origem, doações, dados históricos)
+  historia?: string;
+  // Aba "Simbolismo Litúrgico"
+  simbolismoLiturgico?: string;
+  // Aba "Informações" (campos patrimoniais/técnicos)
+  material?: string;
+  codigoPatrimonial?: string;
+  dataAquisicao?: string;
+  responsavel?: string;
 }
 
