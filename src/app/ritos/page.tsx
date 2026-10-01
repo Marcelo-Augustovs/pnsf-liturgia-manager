@@ -158,17 +158,24 @@ export default function RitosMissaPage() {
     <div className="min-h-screen bg-[#F8F4EC] text-[#17243A] flex flex-col font-sans relative overflow-x-hidden">
 
       {/* HEADER SUPREMO INSTITUCIONAL (AZUL-MARINHO COM GRADIENTE) */}
-      <header className="bg-gradient-to-b from-[#17243A] to-[#121D2F] text-white sticky top-0 z-30 shadow-md border-b border-[#253654]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3.5">
+      <header className="bg-gradient-to-b from-[#17243A] via-[#1A2840] to-[#121D2F] text-white sticky top-0 z-30 shadow-md border-b border-[#253654]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col md:flex-row items-center justify-between gap-4">
+          
+          {/* BRAND & TITLE */}
+          <div className="flex items-center gap-3.5 w-full md:w-auto">
             {/* LOGOTIPO CIRCULAR COM ÍCONE EM DOURADO */}
-            <div className="w-10 h-10 rounded-full border border-[#DDBB70]/50 bg-[#17243A] flex items-center justify-center text-[#DDBB70] shadow-sm flex-shrink-0">
+            <div className="w-10 h-10 rounded-full border border-[#DDBB70]/60 bg-[#17243A] flex items-center justify-center text-[#DDBB70] shadow-sm flex-shrink-0 ring-2 ring-[#DDBB70]/20">
               <Church className="w-5 h-5" />
             </div>
             <div>
-              <h1 className="text-xl font-bold font-serif tracking-wide text-white leading-tight">
-                Liturgia da Santa Missa
-              </h1>
+              <div className="flex items-center gap-2">
+                <h1 className="text-xl font-bold font-serif tracking-wide text-white leading-tight">
+                  Liturgia da Santa Missa
+                </h1>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#DDBB70]/20 text-[#DDBB70] border border-[#DDBB70]/40 uppercase tracking-widest hidden sm:inline-block">
+                  Ordem do Rito
+                </span>
+              </div>
               <p className="text-[10px] sm:text-[11px] font-semibold tracking-widest text-[#DDBB70]/90 uppercase mt-0.5">
                 ORDEM DO RITO • GUIA INTERATIVO POR CELEBRAÇÕES LITÚRGICAS
               </p>
@@ -176,20 +183,34 @@ export default function RitosMissaPage() {
           </div>
 
           {/* BOTÕES DE NAVEGAÇÃO SUPERIOR */}
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center flex-wrap gap-2 w-full md:w-auto justify-end">
             <Link
               href="/"
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold bg-[#F5E6CA] hover:bg-[#EED5AA] text-[#17243A] transition-all cursor-pointer shadow-xs"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold text-[#DDBB70] hover:bg-[#DDBB70]/10 border border-[#DDBB70]/30 transition-all cursor-pointer min-h-[44px] sm:min-h-0"
             >
-              <Home className="w-3.5 h-3.5 text-[#17243A]" />
+              <Home className="w-3.5 h-3.5" />
               <span>Início</span>
             </Link>
+
+            <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-[#DDBB70] text-[#17243A] shadow-sm min-h-[44px] sm:min-h-0">
+              <Layers className="w-3.5 h-3.5 text-[#17243A]" />
+              <span>Guia de Ritos</span>
+            </div>
+
             <Link
               href="/ritos-complementares"
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold bg-transparent hover:bg-white/5 text-[#F5E6CA] border border-[#D3C4A5]/60 transition-all cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold text-[#DDBB70] hover:bg-[#DDBB70]/10 border border-[#DDBB70]/30 transition-all cursor-pointer min-h-[44px] sm:min-h-0"
             >
-              <BookOpen className="w-3.5 h-3.5 text-[#F5E6CA]" />
+              <BookOpen className="w-3.5 h-3.5" />
               <span>Ritos Complementares</span>
+            </Link>
+
+            <Link
+              href="/sacristia"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold text-[#DDBB70] hover:bg-[#DDBB70]/10 border border-[#DDBB70]/30 transition-all cursor-pointer min-h-[44px] sm:min-h-0"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Sacristia</span>
             </Link>
           </div>
         </div>

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { MENU_LIST } from '@/data/ritosData';
 import { DynamicIcon } from '@/components/DynamicIcon';
 import { MediaRenderer } from '@/components/MediaRenderer';
-import { CheckCircle2, ChevronRight, Church, BookOpen, Layers, ArrowLeft, Sparkles } from 'lucide-react';
+import { CheckCircle2, ChevronRight, Church, BookOpen, Layers, ArrowLeft, Sparkles, Home } from 'lucide-react';
 
 export default function RitosComplementaresPage() {
   const [selectedNavIndex, setSelectedNavIndex] = useState<number>(0);
@@ -30,36 +30,58 @@ export default function RitosComplementaresPage() {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
       {/* Top Header Bar */}
-      <header className="bg-slate-900 border-b border-slate-800 text-white sticky top-0 z-30 shadow-md">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-amber-600/20 border border-amber-500/40 flex items-center justify-center text-amber-500 shadow-inner">
+      <header className="bg-gradient-to-b from-[#17243A] via-[#1A2840] to-[#121D2F] text-white sticky top-0 z-30 shadow-md border-b border-[#253654]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col md:flex-row items-center justify-between gap-4">
+          
+          {/* BRAND & TITLE */}
+          <div className="flex items-center gap-3.5 w-full md:w-auto">
+            <div className="w-10 h-10 rounded-full border border-[#DDBB70]/60 bg-[#17243A] flex items-center justify-center text-[#DDBB70] shadow-sm flex-shrink-0 ring-2 ring-[#DDBB70]/20">
               <Church className="w-5 h-5" />
             </div>
             <div>
-              <h1 className="text-lg font-bold font-serif tracking-wide text-amber-400">
-                Ritos Complementares & Sacramentais
-              </h1>
-              <p className="text-xs text-slate-400 hidden sm:block">
-                Portal Litúrgico • Guia Orientativo dos Ritos e Cerimoniais
+              <div className="flex items-center gap-2">
+                <h1 className="text-xl font-bold font-serif tracking-wide text-white leading-tight">
+                  Ritos Complementares
+                </h1>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#DDBB70]/20 text-[#DDBB70] border border-[#DDBB70]/40 uppercase tracking-widest hidden sm:inline-block">
+                  Sacramentais
+                </span>
+              </div>
+              <p className="text-[10px] sm:text-[11px] font-semibold tracking-widest text-[#DDBB70]/90 uppercase mt-0.5">
+                PORTAL LITÚRGICO • GUIA ORIENTATIVO DOS RITOS E CERIMONIAIS
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          {/* NAVIGATION LINKS */}
+          <div className="flex items-center flex-wrap gap-2 w-full md:w-auto justify-end">
             <Link
               href="/"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 border border-slate-700 transition-all cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold text-[#DDBB70] hover:bg-[#DDBB70]/10 border border-[#DDBB70]/30 transition-all cursor-pointer min-h-[44px] sm:min-h-0"
             >
-              <ArrowLeft className="w-3.5 h-3.5" />
+              <Home className="w-3.5 h-3.5" />
               <span>Início</span>
             </Link>
+
             <Link
               href="/ritos"
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold transition-all shadow-sm cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold text-[#DDBB70] hover:bg-[#DDBB70]/10 border border-[#DDBB70]/30 transition-all cursor-pointer min-h-[44px] sm:min-h-0"
+            >
+              <Layers className="w-3.5 h-3.5" />
+              <span>Guia de Ritos</span>
+            </Link>
+
+            <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-[#DDBB70] text-[#17243A] shadow-sm min-h-[44px] sm:min-h-0">
+              <BookOpen className="w-3.5 h-3.5 text-[#17243A]" />
+              <span>Ritos Complementares</span>
+            </div>
+
+            <Link
+              href="/sacristia"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold text-[#DDBB70] hover:bg-[#DDBB70]/10 border border-[#DDBB70]/30 transition-all cursor-pointer min-h-[44px] sm:min-h-0"
             >
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Ritos da Missa</span>
+              <span>Sacristia</span>
             </Link>
           </div>
         </div>
