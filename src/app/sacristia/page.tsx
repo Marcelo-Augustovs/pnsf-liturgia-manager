@@ -17,6 +17,17 @@ import {
   ArrowLeft,
 } from 'lucide-react';
 
+// Nomes legíveis dos módulos para o banner "Módulo Ativo"
+const MODULO_NOMES: Record<string, string> = {
+  alfaias:    'Alfaias Litúrgicas (3 Águas)',
+  toalhas:    'Toalhas & Têxteis do Altar',
+  paramentos: 'Véus e Casulas / Paramentos',
+  vasos:      'Vasos Sagrados',
+  consumiveis:'Materiais de Consumo',
+  decoracao:  'Sacristia & Objetos',
+  todas:      'Todas as Categorias',
+};
+
 const LOCAL_STORAGE_KEY = 'pnsf_sacristia_state_v1';
 
 // LAZY LOADING REAL DE COMPONENTES DE CATEGORIA COM NEXT/DYNAMIC
@@ -405,7 +416,7 @@ export default function SacristiaDashboardPage() {
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-[#DDBB70] animate-ping" />
                 <span className="text-xs font-bold font-serif text-[#17243A] uppercase tracking-wider">
-                  Módulo Ativo: {activeCategory === 'todas' ? 'Todas as Categorias' : activeCategory}
+                  Módulo Ativo: {MODULO_NOMES[activeCategory] ?? activeCategory}
                 </span>
               </div>
 
@@ -451,7 +462,7 @@ export default function SacristiaDashboardPage() {
                   consumiveis: loadedCategoriesData.consumiveis || [],
                   decoracoes: loadedCategoriesData.decoracoes || [],
                 }}
-                activeCategoryFilter={activeCategory === 'todas' ? 'todos' : activeCategory}
+                activeCategoryFilter={activeCategory === 'todas' ? 'todos' : (activeCategory ?? 'todos')}
                 onUpdateToalha={handleUpdateToalha}
                 onUpdateParamento={handleUpdateParamento}
                 onUpdateVaso={handleUpdateVaso}
