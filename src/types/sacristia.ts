@@ -21,6 +21,7 @@ export interface ItemAlfaia {
   tipo: 'Sanguíneo' | 'Corporal' | 'Pala' | 'Manustérgio';
   etapaLavagem: AlfaiaEtapa;
   localizacao: string;
+  imagem?: string | null;
   observacao?: string;
   ultimaAtualizacao: string;
 }
@@ -33,6 +34,7 @@ export interface ItemToalha {
   status: 'em_uso' | 'aguardando_lavagem' | 'passar' | 'guardada' | 'em_manutencao';
   corLiturgica?: string;
   localizacao: string;
+  imagem?: string | null;
   observacao?: string;
   ultimaAtualizacao: string;
 }
@@ -45,6 +47,7 @@ export interface ItemParamento {
   corLiturgica: 'Verde' | 'Roxo' | 'Branco' | 'Vermelho' | 'Rosa' | 'Dourado';
   status: 'em_uso' | 'guardado' | 'em_manutencao' | 'lavanderia';
   localizacao: string;
+  imagem?: string | null;
   observacao?: string;
   ultimaAtualizacao: string;
 }
@@ -57,6 +60,7 @@ export interface ItemVasoSagrado {
   material: string;
   status: 'em_uso' | 'guardado' | 'em_manutencao' | 'higienizacao';
   localizacao: string;
+  imagem?: string | null;
   observacao?: string;
   ultimaAtualizacao: string;
 }
@@ -71,6 +75,7 @@ export interface ItemConsumivel {
   taxaConsumoPorDia?: number;
   taxaConsumoPorCelebracao: number;
   alertaMinimo: number;
+  imagem?: string | null;
   observacao?: string;
 }
 
@@ -81,6 +86,7 @@ export interface ItemDecoracao {
   tipo: 'Tapete' | 'Suporte' | 'Banquinho' | 'Quadro Sacro' | 'Imagem Sacra' | 'Castiçal';
   status: 'em_uso' | 'guardado' | 'em_manutencao';
   localizacao: string;
+  imagem?: string | null;
   observacao?: string;
   ultimaAtualizacao: string;
 }
@@ -93,3 +99,29 @@ export interface SacristiaState {
   consumiveis: ItemConsumivel[];
   decoracoes: ItemDecoracao[];
 }
+
+// REST/GraphQL API Readiness Types
+export interface ModuloSacristia {
+  id: SacristiaCategoria;
+  nome: string;
+  chipSubtitulo: string;
+  descricao: string;
+  subcategorias: string[];
+}
+
+export interface ItemInventario {
+  id: string;
+  codigo: string;
+  nome: string;
+  moduloId: 'alfaias' | 'toalhas' | 'paramentos' | 'vasos' | 'decoracao';
+  categoriaNome: string;
+  statusGeral: 'em_uso' | 'guardado' | 'lavagem' | 'manutencao';
+  statusRotulo: string;
+  localizacao: string;
+  imagem?: string | null;
+  detalhesExtra?: string;
+  observacao?: string;
+  ultimaAtualizacao: string;
+  originalData: any;
+}
+
