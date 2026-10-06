@@ -2,7 +2,7 @@ export type FormaCelebracao = 'ordinaria' | 'ad_orientem' | 'extraordinaria';
 
 export type TempoLiturgico = 'quaresma' | 'pascal' | 'comum' | 'advento';
 
-export type GrauCelebracao = 'solenidade' | 'festa' | 'memoria' | 'datas_moveis' | 'domingo';
+export type GrauCelebracao = 'solenidade' | 'festa' | 'memoria' | 'datas_moveis' | 'dominical' | 'semanal' | 'semana_santa' | 'padroeira';
 
 export type GrupoRito = 'iniciais' | 'palavra' | 'eucaristica' | 'finais' | 'ritosDevocionais' | 'estruturaCelebracao';
 

@@ -96,7 +96,10 @@ export const GRAUS_CELEBRACAO_OPTIONS: GrauCelebracaoOption[] = [
   { id: 'festa', nome: 'Festa', descricao: 'Celebração de grande importância. Possui Glória e 2 leituras.' },
   { id: 'memoria', nome: 'Memória Obrigatória', descricao: 'Recordação litúrgica dos Santos e Mártires.' },
   { id: 'datas_moveis', nome: 'Datas Móveis', descricao: 'Celebrações que variam a data a cada ano conforme o cômputo da Páscoa.' },
-  { id: 'domingo', nome: 'Domingo', descricao: 'Dia do Senhor e Páscoa semanal da Igreja.' }
+  { id: 'dominical', nome: 'Dominical', descricao: 'Dia do Senhor e Páscoa semanal da Igreja.' },
+  { id: 'semanal', nome: 'Semanal', descricao: 'Missas celebradas durante os dias da semana, fora dos dias de festas e solenidades.' },
+  { id: 'semana_santa', nome: 'Semana Santa', descricao: 'Semana Santa, também conhecida como Semana Maior, é o período mais importante do ano litúrgico católico, que vai do Domingo de Ramos ao Domingo de Páscoa. ' },
+  { id: 'padroeira', nome: 'Festa da Padroeira', descricao: 'Celebração da padroeira da paróquia' }
 ];
 
 export const GRUPOS_RITO_INFO: Record<string, GrupoRitoInfo> = {
@@ -146,7 +149,7 @@ export const CELEBRACOES_DATA: Celebracao[] = [
     descricaoBreve: 'Missa do Primeiro Domingo da Quaresma com ritos penitenciais próprios, omissão do Glória e Aclamação Quaresmal em vez do Aleluia.',
     forma: 'ordinaria',
     tempoLiturgico: 'quaresma',
-    grauCelebracao: 'domingo',
+    grauCelebracao: 'dominical',
     imageUrl: '/images/quaresma.jpg',
     imagem: '/images/quaresma.jpg',
     ritos: {
