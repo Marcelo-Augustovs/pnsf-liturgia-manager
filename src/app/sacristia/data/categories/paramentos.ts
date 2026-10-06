@@ -37,12 +37,13 @@ export const mockParamentos: ItemParamento[] = [
   {
     id: 'par-004',
     codigo: 'PAR-004',
-    nome: 'Véu de Cálice Roxo Quaresmal',
+    nome: 'Véu de Cálice Verde',
     tipo: 'Véu de Cálice',
-    corLiturgica: 'Roxo',
+    corLiturgica: 'Verde',
+    imagem: '/images/veu-de-calice/verde.jpg',
     status: 'em_uso',
     localizacao: 'Credência Principal',
-    observacao: 'Acompanha o jogo litúrgico de Quaresma',
+    observacao: 'Acompanha o jogo litúrgico',
     ultimaAtualizacao: 'Hoje, 07:00',
   },
   {
